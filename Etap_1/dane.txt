@@ -1,0 +1,6 @@
+nazwiska, imiona, adresy mailowe oraz numery grup członków zespołu:
+    Karol Skorek karol9727@o2.pl 1ID22B, Mateusz Skrok mateusz1251@gmail.com 1ID22B
+temat projektu:
+    27. Modelowanie bazy danych
+spis technologii, które będą używane (systemów, języków programowania, najważniejszych bibliotek, frameworków, itp.):
+    Java/JavaFX
