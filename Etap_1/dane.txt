@@ -4,3 +4,23 @@ temat projektu:
     27. Modelowanie bazy danych
 spis technologii, które będą używane (systemów, języków programowania, najważniejszych bibliotek, frameworków, itp.):
     Java/JavaFX
+Lista funkcjonalności:
+	(do 5 kwietnia):
+		Dodawanie tabeli(Karol Skorek)
+		Dodawanie relacji między tabelami(Mateusz Skrok)
+	(do 3 maja):
+		Możliwość wyboru klucza głównego(Karol Skorek)
+		Dodawanie atrybutów do tabeli(Mateusz Skrok)
+		Automatyczne usunięcie/dodawanie klucza obcego w przypadku usunięcia/dodawanie tabeli (Karol Skorek)
+		W przypadku wyboru wiele do wielu automatycznie tworzona tabela pośrednia(Mateusz Skrok)
+	(do 7 czerwca):
+		Możliwość wyboru specjalnych atrybutów pól np unique(Karol Skorek)
+		Możliwość wygenerowania kodu sql z diagramu/diagramu z sql(Mateusz Skrok)
+		Możliwość zapisu wygenerowanych plików(Karol Skorek)
+		Możliwość wczytywania diagramów/kodu(Mateusz Skrok)
+	
+Temat z "Programowanie systemów rozproszonych": Sieciowa gra Memory
+Temat pracy inżynierskiej Karol Skorek: Projekt i implementacja systemu zarządzania bankiem
+Temat pracy magisterskiej Karol Skorek: jeszcze nie jest wybrany temat ale związany będzie ze sztuczną inteligencją
+Temat pracy inżynierskiej Mateusz Skrok: Informatyczny system obsługi hurtowni
+Temat pracy magisterskiej Mateusz Skrok: brak
