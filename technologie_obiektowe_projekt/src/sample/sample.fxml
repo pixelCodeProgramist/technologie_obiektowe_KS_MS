@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>
@@ -11,7 +11,7 @@
       <RowConstraints />
    </rowConstraints>
    <children>
-      <Pane prefHeight="780.0" prefWidth="1000.0">
+      <Pane fx:id="samplePane" prefHeight="780.0" prefWidth="1000.0">
          <children>
             <Button layoutX="400.0" layoutY="176.0" mnemonicParsing="false" onMouseClicked="#openERDCreator" prefHeight="47.0" prefWidth="175.0" text="Zbuduj diagram ERD" />
             <Button layoutX="400.0" layoutY="254.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="175.0" text="Zbuduj sql" />

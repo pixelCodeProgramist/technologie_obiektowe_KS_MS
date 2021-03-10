@@ -1,5 +1,6 @@
 package sample;
 
+import Config.Configuration;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,9 +15,12 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("../ERDCreator/ERDCreator.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../sample/sample.fxml"));
+        Controller controller = new Controller();
+        loader.setController(controller);
+        Parent root = loader.load();
         primaryStage.setTitle("Kreator diagramów");
-        primaryStage.setScene(new Scene(root, 1000, 780));
+        primaryStage.setScene(new Scene(root, Configuration.WIDTH, Configuration.HEIGHT));
         primaryStage.show();
     }
 
