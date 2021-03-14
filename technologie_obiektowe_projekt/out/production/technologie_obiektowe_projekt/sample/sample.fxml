@@ -11,12 +11,12 @@
       <RowConstraints />
    </rowConstraints>
    <children>
-      <Pane fx:id="samplePane" prefHeight="780.0" prefWidth="1000.0">
+      <AnchorPane fx:id="samplePane" prefHeight="780.0" prefWidth="1000.0">
          <children>
             <Button layoutX="400.0" layoutY="176.0" mnemonicParsing="false" onMouseClicked="#openERDCreator" prefHeight="47.0" prefWidth="175.0" text="Zbuduj diagram ERD" />
             <Button layoutX="400.0" layoutY="254.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="175.0" text="Zbuduj sql" />
             <Button layoutX="400.0" layoutY="334.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="175.0" text="Wczytaj sql" />
             <Button layoutX="400.0" layoutY="415.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="175.0" text="Wczytaj diagram" />
-         </children></Pane>
+         </children></AnchorPane>
    </children>
 </GridPane>

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class Model {
+    private String id;
     private String url;
     private String description;
     private Image image;
