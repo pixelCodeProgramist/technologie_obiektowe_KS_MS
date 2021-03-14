@@ -13,10 +13,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -160,18 +157,29 @@ public class ERDCreatorController {
                 setNodePositionIfDragged(e);
                 setLabelTextIfClicked(e);
             });
-
         });
     }
 
     private void setLabelTextIfClicked(MoveableNodeModel e) {
         e.getLabel().setOnMouseClicked(event -> {
-            String str = "jdjdjefjlfdjjkdfjkdklfdkdfkdfujjkjkkjjkjkhjjkhj";
-            e.getLabel().setMinWidth(str.length()*6.5);
-            e.getListView().setMinWidth(str.length()*6.5);
-            e.getLabel().setText(str);
-            e.getLabel().setAlignment(Pos.CENTER);
+            TextField textField = new TextField();
+            e.gethBox().getChildren().add(textField);
+            Label label = new Label();
+            e.gethBox().getChildren().remove(e.getLabel());
 
+            workingPane.setOnMouseClicked(ec->{
+                label.setText(textField.getText());
+                String helpString = label.getText().replaceAll("\\s", "");
+                if(!label.getText().trim().equals("")&&helpString.equals(label.getText())) {
+                    if(!e.gethBox().getChildren().contains(label)) {
+                        e.gethBox().getChildren().remove(textField);
+                        label.setMinWidth(label.getText().length()*6.5);
+                        e.getListView().setMinWidth(label.getText().length()*6.5);
+                        e.gethBox().getChildren().add(label);
+                        e.setLabel(label);
+                    }
+                }
+            });
         });
     }
 

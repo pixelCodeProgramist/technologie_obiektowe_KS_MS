@@ -35,4 +35,20 @@ public class MoveableNodeModel {
     public ListView getListView() {
         return listView;
     }
+
+    public void setAnchorPane(AnchorPane anchorPane) {
+        this.anchorPane = anchorPane;
+    }
+
+    public void setLabel(Label label) {
+        this.label = label;
+    }
+
+    public void sethBox(HBox hBox) {
+        this.hBox = hBox;
+    }
+
+    public void setListView(ListView listView) {
+        this.listView = listView;
+    }
 }
