@@ -3,6 +3,8 @@ package ERDCreator;
 import Config.Configuration;
 import DirectoryExtender.DirectoryExtender;
 import ERDCreator.resources.XTableView;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -94,8 +96,6 @@ public class ERDCreatorController {
     }
 
 
-
-
     @FXML
     public void addComponentClick(MouseEvent mouseEvent) throws IOException {
         if (activatedToAddPane) {
@@ -103,12 +103,12 @@ public class ERDCreatorController {
             HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
             Model model = new Model("images/keys/gold.png","");
 
-
             TableModel tableModel = new TableModel("id","INT",model.getImageView(20,20));
             XTableView xTableView = XTableView.generateXTableView(tableModel);
             tableModel.assignPrimaryKey(xTableView);
 
             newLoadedPane.getChildren().add(xTableView);
+
             Label label = new Label(getFirstTextToLabel());
             hBox.getChildren().add(label);
             hBox.setBackground(getColorToMovableNode());
@@ -157,10 +157,13 @@ public class ERDCreatorController {
                 setNodePositionIfPressed(event,ep);
                 setNodePositionIfDragged(moveableNodeModel);
                 setLabelTextIfClicked(moveableNodeModel);
+            });
+            moveableNodeModel.getxTableView().setOnMouseClicked(ec->{
 
             });
         });
     }
+
 
     private void setLabelTextIfClicked(MoveableNodeModel e) {
         e.getLabel().setOnMouseClicked(event -> {
@@ -179,6 +182,7 @@ public class ERDCreatorController {
                         e.getxTableView().setMinWidth(label.getText().length()*6.5);
                         e.gethBox().getChildren().add(label);
                         e.setLabel(label);
+
                     }
                 }
             });
@@ -203,6 +207,7 @@ public class ERDCreatorController {
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
         });
     }
+
 
 
 }

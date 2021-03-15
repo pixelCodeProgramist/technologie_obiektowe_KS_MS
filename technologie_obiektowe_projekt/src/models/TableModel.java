@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
 
 import java.util.ArrayList;
@@ -50,9 +51,12 @@ public class TableModel {
 
         TableColumn keyColumn = new TableColumn("id");
         keyColumn.setCellValueFactory(new PropertyValueFactory("id"));
+        keyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
         keyColumn.setPrefWidth(55);
         TableColumn typeColumn = new TableColumn("type");
         typeColumn.setCellValueFactory(new PropertyValueFactory("type"));
+        typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         typeColumn.setMinWidth(35);
         typeColumn.setMaxWidth(35);
         TableColumn primaryForeignNoneKeyColumn = new TableColumn("primaryForeignNoneKey");

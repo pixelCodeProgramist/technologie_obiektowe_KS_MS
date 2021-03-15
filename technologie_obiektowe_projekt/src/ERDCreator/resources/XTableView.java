@@ -17,6 +17,7 @@ public class XTableView extends TableView {
 
     public static XTableView generateXTableView(TableModel tableModel){
         XTableView xTableView = new XTableView();
+        xTableView.setEditable(true);
         xTableView.setLayoutY(22);
         xTableView.setPrefHeight(58);
         xTableView.setPrefWidth(Config.WIDTH_TABLE);
