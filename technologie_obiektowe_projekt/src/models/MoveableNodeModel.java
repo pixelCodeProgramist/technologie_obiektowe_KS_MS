@@ -1,5 +1,6 @@
 package models;
 
+import ERDCreator.resources.XTableView;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
@@ -11,13 +12,13 @@ public class MoveableNodeModel {
     private AnchorPane anchorPane;
     private Label label;
     private HBox hBox;
-    private ListView listView;
+    private XTableView xTableView;
 
-    public MoveableNodeModel(AnchorPane anchorPane, Label label, HBox hBox, ListView listView) {
+    public MoveableNodeModel(AnchorPane anchorPane, Label label, HBox hBox, XTableView xTableView) {
         this.anchorPane = anchorPane;
         this.label = label;
         this.hBox = hBox;
-        this.listView = listView;
+        this.xTableView = xTableView;
     }
 
     public AnchorPane getAnchorPane() {
@@ -32,10 +33,6 @@ public class MoveableNodeModel {
         return hBox;
     }
 
-    public ListView getListView() {
-        return listView;
-    }
-
     public void setAnchorPane(AnchorPane anchorPane) {
         this.anchorPane = anchorPane;
     }
@@ -48,7 +45,11 @@ public class MoveableNodeModel {
         this.hBox = hBox;
     }
 
-    public void setListView(ListView listView) {
-        this.listView = listView;
+    public XTableView getxTableView() {
+        return xTableView;
+    }
+
+    public void setxTableView(XTableView xTableView) {
+        this.xTableView = xTableView;
     }
 }

@@ -2,32 +2,22 @@ package ERDCreator;
 
 import Config.Configuration;
 import DirectoryExtender.DirectoryExtender;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
+import ERDCreator.resources.XTableView;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import models.Model;
 import models.MoveableNodeModel;
+import models.TableModel;
 import sample.Controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class ERDCreatorController {
@@ -104,20 +94,31 @@ public class ERDCreatorController {
     }
 
 
+
+
     @FXML
     public void addComponentClick(MouseEvent mouseEvent) throws IOException {
         if (activatedToAddPane) {
             AnchorPane newLoadedPane = FXMLLoader.load(getClass().getResource("../ERDCreator/resources/MoveableNode.fxml"));
             HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
-            ListView listView = (ListView) newLoadedPane.getChildren().get(1);
+            Model model = new Model("images/keys/gold.png","");
+
+
+            TableModel tableModel = new TableModel("id","INT",model.getImageView(20,20));
+            XTableView xTableView = XTableView.generateXTableView(tableModel);
+            tableModel.assignPrimaryKey(xTableView);
+
+            newLoadedPane.getChildren().add(xTableView);
             Label label = new Label(getFirstTextToLabel());
             hBox.getChildren().add(label);
             hBox.setBackground(getColorToMovableNode());
             workingPane.getChildren().add(newLoadedPane);
-            MoveableNodeModel moveableNodeModel = new MoveableNodeModel(newLoadedPane, label, hBox, listView);
+            MoveableNodeModel moveableNodeModel = new MoveableNodeModel(newLoadedPane, label, hBox, xTableView);
             nodes.add(moveableNodeModel);
         }
     }
+
+
 
     public String getFirstTextToLabel() {
         if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
@@ -151,11 +152,12 @@ public class ERDCreatorController {
 
 
     public void paneOnMouseMovedEventHandler(MouseEvent event) {
-        nodes.forEach(e -> {
-            e.getAnchorPane().setOnMousePressed(ep -> {
+        nodes.forEach(moveableNodeModel -> {
+            moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event,ep);
-                setNodePositionIfDragged(e);
-                setLabelTextIfClicked(e);
+                setNodePositionIfDragged(moveableNodeModel);
+                setLabelTextIfClicked(moveableNodeModel);
+
             });
         });
     }
@@ -174,7 +176,7 @@ public class ERDCreatorController {
                     if(!e.gethBox().getChildren().contains(label)) {
                         e.gethBox().getChildren().remove(textField);
                         label.setMinWidth(label.getText().length()*6.5);
-                        e.getListView().setMinWidth(label.getText().length()*6.5);
+                        e.getxTableView().setMinWidth(label.getText().length()*6.5);
                         e.gethBox().getChildren().add(label);
                         e.setLabel(label);
                     }
