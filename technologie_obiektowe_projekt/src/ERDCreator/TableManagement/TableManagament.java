@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Rectangle;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
@@ -22,6 +23,11 @@ public class TableManagament extends TableApperance {
     private Set<MoveableNodeModel> nodes = new HashSet<>();
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
+    Rectangle clipRect;
+    public TableManagament() {
+
+    }
+
     public void setParameters(AnchorPane workingPane, Set<MoveableNodeModel> nodes,
                               Optional<Model> chosenModel) {
         this.workingPane = workingPane;
@@ -102,6 +108,13 @@ public class TableManagament extends TableApperance {
             double offsetY = ed.getSceneY() - orgSceneY;
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
+            double finalNewTranslateX = newTranslateX;
+            double finalNewTranslateY = newTranslateY;
+
+            if(newTranslateX>0) newTranslateX=-5;
+            if(newTranslateY>0) newTranslateY=-5;
+            if(newTranslateY<-537) newTranslateY = -532;
+            if(newTranslateX<-578) newTranslateX = -573;
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
         });

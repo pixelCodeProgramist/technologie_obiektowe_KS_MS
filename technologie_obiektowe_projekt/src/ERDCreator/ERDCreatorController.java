@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Rectangle;
 import models.MoveableNodeModel;
 import sample.Controller;
 
