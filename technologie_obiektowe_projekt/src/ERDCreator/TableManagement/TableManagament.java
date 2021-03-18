@@ -85,9 +85,22 @@ public class TableManagament extends TableApperance {
                         model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight()+70);
                     });
                 }
+                if(i==1){
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        if(model.getxTableView().getItems().size()>1) {
+                            TableModel tableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
+                            model.getxTableView().getItems().remove(tableModel);
+                            model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() - 30);
+                            model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() - 30);
+                            model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() - 70);
+                            model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() - 70);
+                            model.getContextMenu().getItems().get(1).setVisible(true);
+                        }else {
+                            model.getContextMenu().getItems().get(1).setVisible(false);
+                        }
+                    });
+                }
             }
-
-
         }
         workingPane.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             model.getContextMenu().hide();
@@ -108,9 +121,6 @@ public class TableManagament extends TableApperance {
             double offsetY = ed.getSceneY() - orgSceneY;
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
-            double finalNewTranslateX = newTranslateX;
-            double finalNewTranslateY = newTranslateY;
-
             if(newTranslateX>0) newTranslateX=-5;
             if(newTranslateY>0) newTranslateY=-5;
             if(newTranslateY<-537) newTranslateY = -532;
@@ -123,7 +133,8 @@ public class TableManagament extends TableApperance {
     public void setInitialContextMenu(MoveableNodeModel m) {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem menuItem = new MenuItem("Dodaj wiersz");
-        contextMenu.getItems().addAll(menuItem);
+        MenuItem menuItem2 = new MenuItem("Usuń wiersz");
+        contextMenu.getItems().addAll(menuItem,menuItem2);
         m.setContextMenu(contextMenu);
     }
 
