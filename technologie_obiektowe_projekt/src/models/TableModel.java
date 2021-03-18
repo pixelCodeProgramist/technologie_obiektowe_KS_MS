@@ -4,15 +4,26 @@ import ERDCreator.resources.XTableView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class TableModel {
+    @Override
+    public String toString() {
+        return "TableModel{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", primaryForeignNoneKey=" + primaryForeignNoneKey +
+                '}';
+    }
+
     private String id;
     private String type;
     private ImageView primaryForeignNoneKey;
@@ -52,13 +63,15 @@ public class TableModel {
         TableColumn keyColumn = new TableColumn("id");
         keyColumn.setCellValueFactory(new PropertyValueFactory("id"));
         keyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
-        keyColumn.setPrefWidth(55);
+        keyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        keyColumn.setMinWidth(25);
+        keyColumn.setMaxWidth(25);
         TableColumn typeColumn = new TableColumn("type");
         typeColumn.setCellValueFactory(new PropertyValueFactory("type"));
-        typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         typeColumn.setMinWidth(35);
         typeColumn.setMaxWidth(35);
+        typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
         TableColumn primaryForeignNoneKeyColumn = new TableColumn("primaryForeignNoneKey");
         primaryForeignNoneKeyColumn.setCellValueFactory(new PropertyValueFactory("primaryForeignNoneKey"));
         primaryForeignNoneKeyColumn.setMinWidth(35);
@@ -78,6 +91,8 @@ public class TableModel {
         list.add(new TableModel(id,type,primaryForeignNoneKey));
         ObservableList data = FXCollections.observableList(list);
         xTableView.setItems(data);
+
     }
+
 }
 

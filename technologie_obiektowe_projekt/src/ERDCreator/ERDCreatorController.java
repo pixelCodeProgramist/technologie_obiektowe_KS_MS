@@ -3,8 +3,6 @@ package ERDCreator;
 import Config.Configuration;
 import DirectoryExtender.DirectoryExtender;
 import ERDCreator.resources.XTableView;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,9 +16,11 @@ import models.MoveableNodeModel;
 import models.TableModel;
 import sample.Controller;
 
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ERDCreatorController {
     @FXML
@@ -36,8 +36,10 @@ public class ERDCreatorController {
     private Optional<Model> chosenModel;
     private int classNumber = 0;
     private int tabelNumber = 0;
+
     @FXML
     private AnchorPane workingPane;
+
 
     public void initialize() throws FileNotFoundException {
         models = new ArrayList<>();
@@ -101,11 +103,12 @@ public class ERDCreatorController {
         if (activatedToAddPane) {
             AnchorPane newLoadedPane = FXMLLoader.load(getClass().getResource("../ERDCreator/resources/MoveableNode.fxml"));
             HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
-            Model model = new Model("images/keys/gold.png","");
+            Model model = new Model("images/keys/gold.png", "");
 
-            TableModel tableModel = new TableModel("id","INT",model.getImageView(20,20));
+            TableModel tableModel = new TableModel("id", "INT", model.getImageView(20, 20));
             XTableView xTableView = XTableView.generateXTableView(tableModel);
             tableModel.assignPrimaryKey(xTableView);
+
 
             newLoadedPane.getChildren().add(xTableView);
 
@@ -117,7 +120,6 @@ public class ERDCreatorController {
             nodes.add(moveableNodeModel);
         }
     }
-
 
 
     public String getFirstTextToLabel() {
@@ -154,12 +156,14 @@ public class ERDCreatorController {
     public void paneOnMouseMovedEventHandler(MouseEvent event) {
         nodes.forEach(moveableNodeModel -> {
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
-                setNodePositionIfPressed(event,ep);
+                setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
                 setLabelTextIfClicked(moveableNodeModel);
             });
-            moveableNodeModel.getxTableView().setOnMouseClicked(ec->{
-
+            //if (moveableNodeModel.getxTableView().getSelectionModel().getSelectedItem() != null)
+            //    System.out.println(((TableModel) moveableNodeModel.getxTableView().getSelectionModel().getSelectedItem()).getId());
+            moveableNodeModel.getxTableView().setOnMouseClicked(ec -> {
+                setResize(moveableNodeModel);
             });
         });
     }
@@ -172,17 +176,16 @@ public class ERDCreatorController {
             Label label = new Label();
             e.gethBox().getChildren().remove(e.getLabel());
 
-            workingPane.setOnMouseClicked(ec->{
+            workingPane.setOnMouseClicked(ec -> {
                 label.setText(textField.getText());
                 String helpString = label.getText().replaceAll("\\s", "");
-                if(!label.getText().trim().equals("")&&helpString.equals(label.getText())) {
-                    if(!e.gethBox().getChildren().contains(label)) {
+                if (!label.getText().trim().equals("") && helpString.equals(label.getText())) {
+                    if (!e.gethBox().getChildren().contains(label)) {
                         e.gethBox().getChildren().remove(textField);
-                        label.setMinWidth(label.getText().length()*6.5);
-                        e.getxTableView().setMinWidth(label.getText().length()*6.5);
+                        label.setMinWidth(label.getText().length() * 6.5);
+                        e.getxTableView().setMinWidth(label.getText().length() * 6.5);
                         e.gethBox().getChildren().add(label);
                         e.setLabel(label);
-
                     }
                 }
             });
@@ -190,14 +193,14 @@ public class ERDCreatorController {
     }
 
 
-    public void setNodePositionIfPressed(MouseEvent event,MouseEvent ep){
+    public void setNodePositionIfPressed(MouseEvent event, MouseEvent ep) {
         orgSceneX = ep.getSceneX();
         orgSceneY = ep.getSceneY();
-        orgTranslateX=-event.getX();
-        orgTranslateY=-event.getY();
+        orgTranslateX = -event.getX();
+        orgTranslateY = -event.getY();
     }
 
-    public void setNodePositionIfDragged(MoveableNodeModel e){
+    public void setNodePositionIfDragged(MoveableNodeModel e) {
         e.getAnchorPane().setOnMouseDragged(ed -> {
             double offsetX = ed.getSceneX() - orgSceneX;
             double offsetY = ed.getSceneY() - orgSceneY;
@@ -208,6 +211,53 @@ public class ERDCreatorController {
         });
     }
 
+
+    public void setResize(MoveableNodeModel m) {
+        XTableView xTableView = m.getxTableView();
+        AtomicReference<Double> max = new AtomicReference<>((double) 10);
+        xTableView.getColumns().stream().forEach(column -> {
+            TableColumn tableColumn = (TableColumn) column;
+            tableColumn.setOnEditCommit(comm -> {
+                double tableWidth = 0;
+                TableColumn.CellEditEvent cellEditEvent = (TableColumn.CellEditEvent) comm;
+                TableModel tableModel = (TableModel)
+                        cellEditEvent.getTableView().getItems().get(cellEditEvent.getTablePosition().getRow());
+                if (cellEditEvent.getTablePosition().getColumn() == 0) tableModel.setId((String)
+                        cellEditEvent.getNewValue());
+                if (cellEditEvent.getTablePosition().getColumn() == 1) tableModel.setType((String)
+                        cellEditEvent.getNewValue());
+
+                for (int i = 0; i < xTableView.getItems().size(); i++) {
+                    if (!tableColumn.getCellData(i).equals("")) {
+                        double size = 12.5 *
+                                tableColumn.getCellData(i).toString().length();
+                        if (size > max.get() && !tableColumn.getCellData(i).getClass().equals(ImageView.class)) {
+                            max.set(size);
+                        }
+                        if (tableColumn.getCellData(i).getClass().equals(ImageView.class)) {
+                            max.set(tableColumn.getMinWidth());
+                        }
+                        tableColumn.setMinWidth(max.get());
+                        tableColumn.setMaxWidth(max.get());
+                    }
+                }
+                for (int j = 0; j < xTableView.getColumns().size(); j++) {
+                    tableWidth += ((TableColumn) xTableView.getColumns().get(j)).getWidth();
+                }
+                xTableView.setMinWidth(tableWidth+10);
+                xTableView.setMaxWidth(tableWidth+10);
+                if((tableWidth+10)>m.gethBox().getWidth()) {
+                    m.gethBox().setMinWidth(tableWidth+10);
+                    m.gethBox().setMaxWidth(tableWidth+10);
+                }else {
+                    xTableView.setMinWidth(m.gethBox().getMinWidth());
+                    xTableView.setMaxWidth(m.gethBox().getMaxWidth());
+                }
+
+            });
+
+        });
+    }
 
 
 }
