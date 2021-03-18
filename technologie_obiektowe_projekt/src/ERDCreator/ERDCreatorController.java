@@ -18,16 +18,9 @@ import java.util.Set;
 public class ERDCreatorController {
     @FXML
     private TreeView<String> idTabels;
-
-
-
     private Set<MoveableNodeModel> nodes;
-
     private TableManagament tableManagament;
-
     private LeftPanelCreator leftPanelCreator;
-
-
     @FXML
     private AnchorPane workingPane;
 
@@ -39,7 +32,6 @@ public class ERDCreatorController {
         tableManagament = new TableManagament();
         tableManagament.setParameters(workingPane,nodes,leftPanelCreator.getChosenModel());
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
-
     }
 
 

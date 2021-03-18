@@ -87,12 +87,12 @@ public class TableModel {
 
 
     public void assignPrimaryKey(XTableView xTableView){
-        List list = new ArrayList();
+        List list = new ArrayList(xTableView.getItems());
         list.add(new TableModel(id,type,primaryForeignNoneKey));
         ObservableList data = FXCollections.observableList(list);
         xTableView.setItems(data);
-
     }
+
 
 }
 
