@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
@@ -19,17 +20,19 @@ import java.util.Set;
 
 
 public class TableManagament extends TableApperance {
-    private AnchorPane workingPane, newLoadedPane;
+    private ScrollPane workingPane;
+    private AnchorPane newLoadedPane;
     private Set<MoveableNodeModel> nodes = new HashSet<>();
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
-    Rectangle clipRect;
-    public TableManagament() {
+    private Pane content;
 
+    public TableManagament() {
     }
 
-    public void setParameters(AnchorPane workingPane, Set<MoveableNodeModel> nodes,
+    public void setParameters(Pane content, ScrollPane workingPane, Set<MoveableNodeModel> nodes,
                               Optional<Model> chosenModel) {
+        this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
         setChosenModel(chosenModel);
@@ -46,7 +49,7 @@ public class TableManagament extends TableApperance {
         Label label = new Label(getFirstTextToLabel());
         hBox.getChildren().add(label);
         hBox.setBackground(getColorToMovableNode());
-        workingPane.getChildren().add(newLoadedPane);
+        content.getChildren().addAll(newLoadedPane);
         MoveableNodeModel moveableNodeModel = new MoveableNodeModel(newLoadedPane, label, hBox, xTableView);
         setInitialContextMenu(moveableNodeModel);
         nodes.add(moveableNodeModel);
@@ -74,20 +77,20 @@ public class TableManagament extends TableApperance {
     private void expandCondextMenu(MouseEvent mp, MoveableNodeModel model) {
         if (mp.isSecondaryButtonDown()) {
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
-            for(int i=0;i<model.getContextMenu().getItems().size();i++) {
-                if(i==0) {
+            for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
+                if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("<nazwa>","<typ>",null);
+                        TableModel tableModel = new TableModel("<nazwa>", "<typ>", null);
                         tableModel.assignPrimaryKey(model.getxTableView());
-                        model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth()+30);
-                        model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight()+30);
-                        model.getxTableView().setMinHeight(model.getxTableView().getMinWidth()+70);
-                        model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight()+70);
+                        model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
+                        model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
+                        model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
+                        model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
                     });
                 }
-                if(i==1){
+                if (i == 1) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        if(model.getxTableView().getItems().size()>1) {
+                        if (model.getxTableView().getItems().size() > 1) {
                             TableModel tableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
                             model.getxTableView().getItems().remove(tableModel);
                             model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() - 30);
@@ -95,9 +98,16 @@ public class TableManagament extends TableApperance {
                             model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() - 70);
                             model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() - 70);
                             model.getContextMenu().getItems().get(1).setVisible(true);
-                        }else {
+                        } else {
                             model.getContextMenu().getItems().get(1).setVisible(false);
                         }
+                    });
+                }
+                if(i == 2) {
+                    model.getContextMenu().getItems().get(i).setOnAction(e ->{
+                        Pane pane = (Pane) workingPane.getContent();
+                        pane.getChildren().remove(model.getAnchorPane());
+                        nodes.remove(model);
                     });
                 }
             }
@@ -115,16 +125,40 @@ public class TableManagament extends TableApperance {
         orgTranslateY = -event.getY();
     }
 
+    private void setOtherNodesInPane(MoveableNodeModel e,int val,boolean isX){
+        ((Pane) workingPane.getContent()).getChildren().forEach(p -> {
+            if(!p.equals(e.getAnchorPane())) {
+                if(isX)
+                    p.setLayoutX(p.getLayoutX()+val);
+                else
+                    p.setLayoutY(p.getLayoutY()+val);
+            }
+        });
+    }
+
     private void setNodePositionIfDragged(MoveableNodeModel e) {
         e.getAnchorPane().setOnMouseDragged(ed -> {
             double offsetX = ed.getSceneX() - orgSceneX;
             double offsetY = ed.getSceneY() - orgSceneY;
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
-            if(newTranslateX>0) newTranslateX=-5;
-            if(newTranslateY>0) newTranslateY=-5;
-            if(newTranslateY<-537) newTranslateY = -532;
-            if(newTranslateX<-578) newTranslateX = -573;
+            if (newTranslateX > 0) {
+                newTranslateX = -5;
+                setOtherNodesInPane(e,3,true);
+            }
+            if (newTranslateY > 0) {
+                newTranslateY = -5;
+                setOtherNodesInPane(e,3,false);
+            }
+            if (newTranslateY < -537) {
+                newTranslateY = -532;
+                setOtherNodesInPane(e,-3,false);
+            }
+
+            if (newTranslateX < -578){
+                newTranslateX = -578;
+                setOtherNodesInPane(e,-3,true);
+            }
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
         });
@@ -134,7 +168,8 @@ public class TableManagament extends TableApperance {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem menuItem = new MenuItem("Dodaj wiersz");
         MenuItem menuItem2 = new MenuItem("Usuń wiersz");
-        contextMenu.getItems().addAll(menuItem,menuItem2);
+        MenuItem menuItem3 = new MenuItem("Usuń tabele");
+        contextMenu.getItems().addAll(menuItem, menuItem2,menuItem3);
         m.setContextMenu(contextMenu);
     }
 

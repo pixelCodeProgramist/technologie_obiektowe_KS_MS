@@ -4,10 +4,10 @@ import Config.Configuration;
 import ERDCreator.LeftPanel.LeftPanelCreator;
 import ERDCreator.TableManagement.TableManagament;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.Pane;
 import models.MoveableNodeModel;
 import sample.Controller;
 
@@ -22,8 +22,9 @@ public class ERDCreatorController {
     private Set<MoveableNodeModel> nodes;
     private TableManagament tableManagament;
     private LeftPanelCreator leftPanelCreator;
+    private Pane content;
     @FXML
-    private AnchorPane workingPane;
+    private ScrollPane workingPane;
 
 
     public void initialize() throws FileNotFoundException {
@@ -31,7 +32,12 @@ public class ERDCreatorController {
         leftPanelCreator = new LeftPanelCreator(idTabels);
         leftPanelCreator.loadTreeItems();
         tableManagament = new TableManagament();
-        tableManagament.setParameters(workingPane,nodes,leftPanelCreator.getChosenModel());
+        content = new Pane();
+        content.autosize();
+        workingPane.setContent(content);
+        this.workingPane.setContent(content);
+        this.workingPane.setPannable(true);
+        tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
     }
 
@@ -50,7 +56,7 @@ public class ERDCreatorController {
     @FXML
     public void addComponentClick(MouseEvent mouseEvent) throws IOException {
         if (leftPanelCreator.isActivatedToAddPane()) {
-            tableManagament.setParameters(workingPane,nodes,leftPanelCreator.getChosenModel());
+            tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
             tableManagament.addComponentClick();
         }
     }

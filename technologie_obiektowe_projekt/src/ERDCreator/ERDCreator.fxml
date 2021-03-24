@@ -19,7 +19,7 @@
                   <TreeView fx:id="idTabels" onContextMenuRequested="#mouseClick" onMouseClicked="#mouseClick" prefHeight="580.0" prefWidth="200.0" />
                </content>
             </ScrollPane>
-            <AnchorPane fx:id="workingPane" layoutX="241.0" layoutY="42.0" prefHeight="616.0" prefWidth="714.0" style="-fx-background-color: lightgray;" AnchorPane.bottomAnchor="220.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
+            <ScrollPane fx:id="workingPane" layoutX="241.0" layoutY="42.0" prefHeight="616.0" prefWidth="714.0" style="-fx-background-color: lightgray;" AnchorPane.bottomAnchor="220.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="40.0" />
             <HBox layoutX="28.0" layoutY="675.0" prefHeight="47.0" prefWidth="200.0">
                <children>
                   <Button mnemonicParsing="false" onMouseClicked="#addComponentClick" prefHeight="34.0" prefWidth="161.0" text="Dodaj komponent" />

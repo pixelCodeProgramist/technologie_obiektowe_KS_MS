@@ -3,6 +3,7 @@ package ERDCreator.TableManagement;
 import ERDCreator.resources.XTableView;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -53,7 +54,7 @@ public class TableApperance {
         return null;
     }
 
-    protected void setLabelTextIfClicked(MoveableNodeModel e,AnchorPane workingPane) {
+    protected void setLabelTextIfClicked(MoveableNodeModel e, ScrollPane workingPane) {
         e.getLabel().setOnMouseClicked(event -> {
             TextField textField = new TextField();
             e.gethBox().getChildren().add(textField);
