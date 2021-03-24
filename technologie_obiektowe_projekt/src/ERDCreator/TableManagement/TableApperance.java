@@ -17,6 +17,9 @@ import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,10 +27,10 @@ public class TableApperance {
     private Optional<Model> chosenModel;
     private int classNumber = 0;
     private int tabelNumber = 0;
-
     protected void setChosenModel(Optional<Model> chosenModel){
         this.chosenModel = chosenModel;
     }
+    private List<String> prohibitedTableNames = new ArrayList<>(Arrays.asList("CREATE","DISTINCT","INSERT","INTO","SELECT","TABLE","*","VALUES","NULL","IS"));
 
     protected String getFirstTextToLabel() {
         if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
@@ -54,6 +57,7 @@ public class TableApperance {
         return null;
     }
 
+
     protected void setLabelTextIfClicked(MoveableNodeModel e, ScrollPane workingPane) {
         e.getLabel().setOnMouseClicked(event -> {
             TextField textField = new TextField();
@@ -64,7 +68,10 @@ public class TableApperance {
             workingPane.setOnMouseClicked(ec -> {
                 label.setText(textField.getText());
                 String helpString = label.getText().replaceAll("\\s", "");
-                if (!label.getText().trim().equals("") && helpString.equals(label.getText())) {
+                if (!label.getText().trim().equals("")
+                        && helpString.equals(label.getText())
+                        && !prohibitedTableNames.contains(helpString.toUpperCase())
+                    ) {
                     if (!e.gethBox().getChildren().contains(label)) {
                         e.gethBox().getChildren().remove(textField);
                         label.setMinWidth(label.getText().length() * 6.5);
