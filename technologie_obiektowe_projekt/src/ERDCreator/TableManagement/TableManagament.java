@@ -2,10 +2,7 @@ package ERDCreator.TableManagement;
 
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import models.Model;
@@ -67,13 +64,13 @@ public class TableManagament extends TableApperance {
             });
 
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
-                expandCondextMenu(mp, moveableNodeModel);
+                expandContextMenu(mp, moveableNodeModel);
             });
 
         });
     }
 
-    private void expandCondextMenu(MouseEvent mp, MoveableNodeModel model) {
+    private void expandContextMenu(MouseEvent mp, MoveableNodeModel model) {
         if (mp.isSecondaryButtonDown()) {
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
             for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
@@ -168,7 +165,13 @@ public class TableManagament extends TableApperance {
         MenuItem menuItem = new MenuItem("Dodaj wiersz");
         MenuItem menuItem2 = new MenuItem("Usuń wiersz");
         MenuItem menuItem3 = new MenuItem("Usuń tabele");
-        contextMenu.getItems().addAll(menuItem, menuItem2,menuItem3);
+        CheckMenuItem menuItem4 = new CheckMenuItem("Primary key");
+        CheckMenuItem menuItem5 = new CheckMenuItem("Foreign key");
+        CheckMenuItem menuItem6 = new CheckMenuItem("Unique");
+        CheckMenuItem menuItem7 = new CheckMenuItem("Not null");
+
+
+        contextMenu.getItems().addAll(menuItem, menuItem2,menuItem3,menuItem4,menuItem5,menuItem6,menuItem7);
         m.setContextMenu(contextMenu);
     }
 
