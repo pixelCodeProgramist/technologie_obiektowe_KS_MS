@@ -17,6 +17,7 @@ public class MoveableNodeModel {
     private XTableView xTableView;
     private ContextMenu contextMenu;
 
+
     public MoveableNodeModel(AnchorPane anchorPane, Label label, HBox hBox, XTableView xTableView) {
         this.anchorPane = anchorPane;
         this.label = label;

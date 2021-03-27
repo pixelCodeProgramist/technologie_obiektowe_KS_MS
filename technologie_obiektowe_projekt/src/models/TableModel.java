@@ -15,18 +15,11 @@ import java.util.List;
 
 
 public class TableModel {
-    @Override
-    public String toString() {
-        return "TableModel{" +
-                "id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", primaryForeignNoneKey=" + primaryForeignNoneKey +
-                '}';
-    }
 
     private String id;
     private String type;
     private ImageView primaryForeignNoneKey;
+    private boolean primaryKey, foreignKey, isUnique, isNotNull;
 
     public TableModel(String id, String type,ImageView primaryForeignNoneKey) {
         this.id = id;
@@ -35,7 +28,40 @@ public class TableModel {
     }
 
     public ImageView getPrimaryForeignNoneKey() {
+
         return primaryForeignNoneKey;
+    }
+
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
+    }
+
+    public boolean isForeignKey() {
+        return foreignKey;
+    }
+
+    public void setForeignKey(boolean foreignKey) {
+        this.foreignKey = foreignKey;
+    }
+
+    public boolean isUnique() {
+        return isUnique;
+    }
+
+    public void setUnique(boolean unique) {
+        isUnique = unique;
+    }
+
+    public boolean isNotNull() {
+        return isNotNull;
+    }
+
+    public void setNotNull(boolean notNull) {
+        isNotNull = notNull;
     }
 
     public void setPrimaryForeignNoneKey(ImageView primaryForeignNoneKey) {
@@ -88,11 +114,23 @@ public class TableModel {
 
     public void assignPrimaryKey(XTableView xTableView){
         List list = new ArrayList(xTableView.getItems());
-        list.add(new TableModel(id,type,primaryForeignNoneKey));
+        list.add(this);
         ObservableList data = FXCollections.observableList(list);
         xTableView.setItems(data);
     }
 
 
+    @Override
+    public String toString() {
+        return "TableModel{" +
+                "id='" + id + '\'' +
+                ", type='" + type + '\'' +
+                ", primaryForeignNoneKey=" + primaryForeignNoneKey +
+                ", primaryKey=" + primaryKey +
+                ", foreignKey=" + foreignKey +
+                ", isUnique=" + isUnique +
+                ", isNotNull=" + isNotNull +
+                '}';
+    }
 }
 

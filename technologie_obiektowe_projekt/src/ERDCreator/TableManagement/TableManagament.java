@@ -3,12 +3,14 @@ package ERDCreator.TableManagement;
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
@@ -22,6 +24,7 @@ public class TableManagament extends TableApperance {
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
     private Pane content;
+
 
     public TableManagament() {
     }
@@ -39,14 +42,21 @@ public class TableManagament extends TableApperance {
         HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
         Model model = new Model("images/keys/gold.png", "");
         TableModel tableModel = new TableModel("id", "INT", model.getImageView(20, 20));
+        tableModel.setPrimaryKey(true);
+        tableModel.setForeignKey(false);
+        tableModel.setNotNull(true);
+        tableModel.setUnique(true);
         XTableView xTableView = XTableView.generateXTableView(tableModel);
         tableModel.assignPrimaryKey(xTableView);
+
         newLoadedPane.getChildren().add(xTableView);
         Label label = new Label(getFirstTextToLabel());
         hBox.getChildren().add(label);
         hBox.setBackground(getColorToMovableNode());
         content.getChildren().addAll(newLoadedPane);
+
         MoveableNodeModel moveableNodeModel = new MoveableNodeModel(newLoadedPane, label, hBox, xTableView);
+        System.out.println(xTableView.getItems());
         setInitialContextMenu(moveableNodeModel);
         nodes.add(moveableNodeModel);
     }
@@ -70,10 +80,26 @@ public class TableManagament extends TableApperance {
         });
     }
 
+
     private void expandContextMenu(MouseEvent mp, MoveableNodeModel model) {
         if (mp.isSecondaryButtonDown()) {
+            TableModel selectedTableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
+            ((CheckMenuItem) model.getContextMenu().getItems().get(3)).setSelected(selectedTableModel.isPrimaryKey());
+            ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
+            ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isUnique());
+            ((CheckMenuItem) model.getContextMenu().getItems().get(6)).setSelected(selectedTableModel.isNotNull());
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
+            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
+            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
+            if(primaryKeyChecked) model.getContextMenu().getItems().get(6).setVisible(false);
+            else model.getContextMenu().getItems().get(6).setVisible(true);
+            if (primaryKeyChecked || foreignKeyChecked) {
+                model.getContextMenu().getItems().get(5).setVisible(false);
+            }else {
+                model.getContextMenu().getItems().get(5).setVisible(true);
+            }
             for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
+
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         TableModel tableModel = new TableModel("<nazwa>", "<typ>", null);
@@ -99,12 +125,65 @@ public class TableManagament extends TableApperance {
                         }
                     });
                 }
-                if(i == 2) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e ->{
+                if (i == 2) {
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         Pane pane = (Pane) workingPane.getContent();
                         pane.getChildren().remove(model.getAnchorPane());
                         nodes.remove(model);
                     });
+                }
+                if (i == 3) {
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        selectedTableModel.setPrimaryKey(!selectedTableModel.isPrimaryKey());
+                        if(selectedTableModel.isPrimaryKey()) {
+                            try {
+                                Model model2 = new Model("images/keys/gold.png", "");
+                                System.out.println("Gold: " + model2.getImageView());
+                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
+                                System.out.println("sel: " + selectedTableModel.getPrimaryForeignNoneKey());
+                                selectedTableModel.setForeignKey(false);
+                                selectedTableModel.setNotNull(true);
+                                selectedTableModel.setUnique(true);
+                            } catch (FileNotFoundException fileNotFoundException) {
+                                fileNotFoundException.printStackTrace();
+                            }
+                        }else {
+                            selectedTableModel.setPrimaryForeignNoneKey(null);
+                        }
+                    });
+                }
+                if (i == 4) {
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        selectedTableModel.setForeignKey(!selectedTableModel.isForeignKey());
+                        if(selectedTableModel.isForeignKey()) {
+                            try {
+                                Model model2 = new Model("images/keys/gray.png", "");
+                                System.out.println("Gray: " + model2.getImageView());
+                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
+                                System.out.println("sel: " + selectedTableModel.getPrimaryForeignNoneKey());
+                                selectedTableModel.setPrimaryKey(false);
+                                selectedTableModel.setNotNull(false);
+                                selectedTableModel.setUnique(false);
+                            } catch (FileNotFoundException fileNotFoundException) {
+                                fileNotFoundException.printStackTrace();
+                            }
+                        }else {
+                            selectedTableModel.setPrimaryForeignNoneKey(null);
+                        }
+                    });
+                }
+                if (i == 5) {
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        selectedTableModel.setUnique(!selectedTableModel.isUnique());
+                    });
+                }
+                System.out.println(selectedTableModel);
+                if (i == 6) {
+
+                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        selectedTableModel.setNotNull(!selectedTableModel.isNotNull());
+                    });
+
                 }
             }
         }
@@ -121,13 +200,13 @@ public class TableManagament extends TableApperance {
         orgTranslateY = -event.getY();
     }
 
-    private void setOtherNodesInPane(MoveableNodeModel e,int val,boolean isX){
+    private void setOtherNodesInPane(MoveableNodeModel e, int val, boolean isX) {
         ((Pane) workingPane.getContent()).getChildren().forEach(p -> {
-            if(!p.equals(e.getAnchorPane())) {
-                if(isX)
-                    p.setLayoutX(p.getLayoutX()+val);
+            if (!p.equals(e.getAnchorPane())) {
+                if (isX)
+                    p.setLayoutX(p.getLayoutX() + val);
                 else
-                    p.setLayoutY(p.getLayoutY()+val);
+                    p.setLayoutY(p.getLayoutY() + val);
             }
         });
     }
@@ -140,20 +219,20 @@ public class TableManagament extends TableApperance {
             double newTranslateY = orgTranslateY - offsetY;
             if (newTranslateX > 0) {
                 newTranslateX = -5;
-                setOtherNodesInPane(e,3,true);
+                setOtherNodesInPane(e, 3, true);
             }
             if (newTranslateY > 0) {
                 newTranslateY = -5;
-                setOtherNodesInPane(e,3,false);
+                setOtherNodesInPane(e, 3, false);
             }
             if (newTranslateY < -537) {
                 newTranslateY = -532;
-                setOtherNodesInPane(e,-3,false);
+                setOtherNodesInPane(e, -3, false);
             }
 
-            if (newTranslateX < -578){
+            if (newTranslateX < -578) {
                 newTranslateX = -578;
-                setOtherNodesInPane(e,-3,true);
+                setOtherNodesInPane(e, -3, true);
             }
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
@@ -166,12 +245,15 @@ public class TableManagament extends TableApperance {
         MenuItem menuItem2 = new MenuItem("Usuń wiersz");
         MenuItem menuItem3 = new MenuItem("Usuń tabele");
         CheckMenuItem menuItem4 = new CheckMenuItem("Primary key");
+        menuItem4.setSelected(true);
         CheckMenuItem menuItem5 = new CheckMenuItem("Foreign key");
+        menuItem5.setSelected(false);
         CheckMenuItem menuItem6 = new CheckMenuItem("Unique");
+        menuItem6.setSelected(true);
         CheckMenuItem menuItem7 = new CheckMenuItem("Not null");
+        menuItem7.setSelected(true);
 
-
-        contextMenu.getItems().addAll(menuItem, menuItem2,menuItem3,menuItem4,menuItem5,menuItem6,menuItem7);
+        contextMenu.getItems().addAll(menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7);
         m.setContextMenu(contextMenu);
     }
 

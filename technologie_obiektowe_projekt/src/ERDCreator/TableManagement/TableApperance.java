@@ -86,6 +86,7 @@ public class TableApperance {
         });
     }
 
+
     protected void setResize(MoveableNodeModel m) {
         XTableView xTableView = m.getxTableView();
         AtomicReference<Double> max = new AtomicReference<>((double) 10);
