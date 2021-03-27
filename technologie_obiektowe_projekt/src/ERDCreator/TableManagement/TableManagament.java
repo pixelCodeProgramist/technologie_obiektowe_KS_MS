@@ -3,7 +3,6 @@ package ERDCreator.TableManagement;
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import models.Model;
@@ -56,7 +55,7 @@ public class TableManagament extends TableApperance {
         content.getChildren().addAll(newLoadedPane);
 
         MoveableNodeModel moveableNodeModel = new MoveableNodeModel(newLoadedPane, label, hBox, xTableView);
-        System.out.println(xTableView.getItems());
+
         setInitialContextMenu(moveableNodeModel);
         nodes.add(moveableNodeModel);
     }
@@ -134,13 +133,21 @@ public class TableManagament extends TableApperance {
                 }
                 if (i == 3) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
+
+
+                         model.getxTableView().getItems().forEach(pk->{
+                             if(!pk.equals(selectedTableModel)&& ((TableModel) pk).isPrimaryKey()){
+                                 ((TableModel) pk).setPrimaryForeignNoneKey(null);
+                                 ((TableModel) pk).setPrimaryKey(false);
+                             }
+                         });
+
                         selectedTableModel.setPrimaryKey(!selectedTableModel.isPrimaryKey());
                         if(selectedTableModel.isPrimaryKey()) {
                             try {
                                 Model model2 = new Model("images/keys/gold.png", "");
-                                System.out.println("Gold: " + model2.getImageView());
                                 selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-                                System.out.println("sel: " + selectedTableModel.getPrimaryForeignNoneKey());
+
                                 selectedTableModel.setForeignKey(false);
                                 selectedTableModel.setNotNull(true);
                                 selectedTableModel.setUnique(true);
@@ -158,9 +165,7 @@ public class TableManagament extends TableApperance {
                         if(selectedTableModel.isForeignKey()) {
                             try {
                                 Model model2 = new Model("images/keys/gray.png", "");
-                                System.out.println("Gray: " + model2.getImageView());
                                 selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-                                System.out.println("sel: " + selectedTableModel.getPrimaryForeignNoneKey());
                                 selectedTableModel.setPrimaryKey(false);
                                 selectedTableModel.setNotNull(false);
                                 selectedTableModel.setUnique(false);
@@ -177,7 +182,7 @@ public class TableManagament extends TableApperance {
                         selectedTableModel.setUnique(!selectedTableModel.isUnique());
                     });
                 }
-                System.out.println(selectedTableModel);
+
                 if (i == 6) {
 
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
@@ -217,6 +222,7 @@ public class TableManagament extends TableApperance {
             double offsetY = ed.getSceneY() - orgSceneY;
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
+
             if (newTranslateX > 0) {
                 newTranslateX = -5;
                 setOtherNodesInPane(e, 3, true);

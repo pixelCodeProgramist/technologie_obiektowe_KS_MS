@@ -33,6 +33,8 @@ public class ERDCreatorController {
         leftPanelCreator.loadTreeItems();
         tableManagament = new TableManagament();
         content = new Pane();
+
+
         content.autosize();
         workingPane.setContent(content);
         this.workingPane.setContent(content);
