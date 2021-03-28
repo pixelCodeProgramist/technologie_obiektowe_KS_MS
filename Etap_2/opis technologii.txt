@@ -1,0 +1,19 @@
+Javafx jest jedna z nowoczesnych bibliotek służącą do tworzenia interfejsu 
+użytkownika. Pojawiła się wraz z wersją Javy 8(wcześniej też istniala 
+ale nie wchodziła do zestawu bibliotek podstawowych) i od tego czasu stała się 
+rekomendowanym rozwiązanie do budowania aplikacji desktopowych. Javafx pozwala 
+tworzyć wydajne aplikacje przy zachowaniu czytelności kodu. Javafx stworzony
+jest przez firmę Oracle
+
+W celu pokazania zalet Javafx należy porównać go do innego popularnego wcześniej 
+frameworku tj. Swinga. Zauważalną zmianą jest dodanie widoku aplikacji w języku 
+XML. Wcześniej widok był pisany w kodzie Javy. Pozwoliło to na łatwiejszą edycję, 
+szybkość tworzenia kodu, możliwość rozdzielenia roli w zespole(jedna osoba 
+projektuje widok a inna projektuje funkcjonalność). Javafx posiada SceneBuilder za
+pomocą którego można sworzyć intefejs graficzny za pomocą przeciągania 
+odpowiednich komponentów. Ponadto można dodać do każdego składnika plik css i 
+samodzielnie definiować jego wygląd. Pozwala to zatem na dogoniejsze programowanie,
+ponieważ nie trzeba wywoływać metod setColor() albo setSize(). Kolejną zaletą 
+javyfx jest to, że w przypadkuj braku komponentu który znajduję się w Swingu można
+przy pomocy specjalnej klasy SwingNode wygorzystać go w aplikacji FX.
+ 
