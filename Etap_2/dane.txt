@@ -1,0 +1,28 @@
+Od ostatniego etapu zostało wykonane:
+-zaplanowanie układu graficznego aplikacji w formie praktycznej
+dla głównego menu oraz dla podstrony zbuduj diagram erd
+- możliwość powrotu do menu głównego
+- dodanie możliwości wyboru tabeli/klasy z panelu bocznego
+- przygotowanie obszaru roboczego dla tabel 
+- dodanie możliwości wyboru relacji w panelu bocznym
+(jeszcze nie można na panelu roboczym)
+- możliwość przesuwania tabel po obszarze roboczym zabezpieczając tabele 
+przed wyjściem poza obszar roboczy
+- możliwość nazywania tabeli wraz zabezpieczniem przed możliwością słów 
+zarezerwowanych dla sql takich jak CREATE, SELECT itd. 
+- możliwość dodawania rekordów do tabeli
+- możliwość usuwania rekrdów z tabeli
+- możliwość określenia pól(na razie ograniczono tylko typ do typów sql. 
+Program nie zaakceptuje innych form niż te zdefiniowane w mysql.
+- możliwość zmieniania klucza głównego
+- możliwość przypisania danemu rekordowi wartości unique not null
+- możliwość przypisania danemu rekordowi klucza obcego(ta opcja zostanie prawdopodobnie 
+zmodyfikowana aby jej nie ustawiać a przy łączeniu tabel tworzył się nowy rekord)
+- rozszerzanie tabeli w zależności od długości tekstu 
+Na następny etap postaram się:
+- dokończyć ograniczenia w stosunku do pierwszej kolumny(np by nie było spacji)
+- dodać relację między tabelami(przynajmniej 1 do 1 oraz 1 do wielu)
+- jeśli się uda zrobię również pozostałe relację oraz dziedziczenie oraz 
+przystąpię do generowania kodu z połączeń klas. Jeśli jeszcze starczy czasu to
+postaram się zapisać diagram do pliku oraz dodam opcję wczytania diagramu.
+Ostatecznym krokiem będzie generowanie kodu sql i przygotowanie do obrony projektu.
