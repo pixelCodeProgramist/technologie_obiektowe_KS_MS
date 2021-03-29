@@ -47,7 +47,6 @@ public class TableManagament extends TableApperance {
         tableModel.setUnique(true);
         XTableView xTableView = XTableView.generateXTableView(tableModel);
         tableModel.assignPrimaryKey(xTableView);
-
         newLoadedPane.getChildren().add(xTableView);
         Label label = new Label(getFirstTextToLabel());
         hBox.getChildren().add(label);
@@ -61,11 +60,17 @@ public class TableManagament extends TableApperance {
     }
 
     public void paneOnMouseMovedEventHandler(MouseEvent event) {
+
         nodes.forEach(moveableNodeModel -> {
+
+
+
+
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
                 setLabelTextIfClicked(moveableNodeModel, workingPane);
+
             });
 
             moveableNodeModel.getxTableView().setOnMouseClicked(ec -> {
@@ -218,28 +223,32 @@ public class TableManagament extends TableApperance {
 
     private void setNodePositionIfDragged(MoveableNodeModel e) {
         e.getAnchorPane().setOnMouseDragged(ed -> {
-            double offsetX = ed.getSceneX() - orgSceneX;
-            double offsetY = ed.getSceneY() - orgSceneY;
+            double offsetX = ed.getSceneX() - orgSceneX - e.getAnchorPane().getLayoutX();
+            double offsetY = ed.getSceneY() - orgSceneY - e.getAnchorPane().getLayoutY();
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
-
-            if (newTranslateX > 0) {
-                newTranslateX = -5;
+            if (newTranslateX > 0+e.getAnchorPane().getLayoutX()) {
+                newTranslateX = -5+e.getAnchorPane().getLayoutX();
                 setOtherNodesInPane(e, 3, true);
+
             }
-            if (newTranslateY > 0) {
-                newTranslateY = -5;
+            if (newTranslateY > 0+e.getAnchorPane().getLayoutY()) {
+                newTranslateY = -5+e.getAnchorPane().getLayoutY();
                 setOtherNodesInPane(e, 3, false);
+
             }
-            if (newTranslateY < -537) {
-                newTranslateY = -532;
+            if (newTranslateY < -537+e.getAnchorPane().getLayoutY()) {
+                newTranslateY = -532+e.getAnchorPane().getLayoutY();
                 setOtherNodesInPane(e, -3, false);
             }
 
-            if (newTranslateX < -578) {
-                newTranslateX = -578;
+            if (newTranslateX < -578+e.getAnchorPane().getLayoutX()) {
+                newTranslateX = -578+e.getAnchorPane().getLayoutX();
                 setOtherNodesInPane(e, -3, true);
+                workingPane.setVvalue(workingPane.getVmax());
+                workingPane.setHvalue(workingPane.getHmax());
             }
+
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
         });

@@ -35,6 +35,7 @@ public class ERDCreatorController {
         content = new Pane();
 
 
+
         content.autosize();
         workingPane.setContent(content);
         this.workingPane.setContent(content);
@@ -60,6 +61,7 @@ public class ERDCreatorController {
         if (leftPanelCreator.isActivatedToAddPane()) {
             tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
             tableManagament.addComponentClick();
+
         }
     }
 }
