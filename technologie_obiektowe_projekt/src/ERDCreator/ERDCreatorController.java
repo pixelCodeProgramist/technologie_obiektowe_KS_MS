@@ -9,6 +9,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import models.MoveableNodeModel;
+import models.TableModel;
 import sample.Controller;
 
 import java.io.FileNotFoundException;
@@ -33,9 +34,6 @@ public class ERDCreatorController {
         leftPanelCreator.loadTreeItems();
         tableManagament = new TableManagament();
         content = new Pane();
-
-
-
         content.autosize();
         workingPane.setContent(content);
         this.workingPane.setContent(content);
@@ -61,7 +59,6 @@ public class ERDCreatorController {
         if (leftPanelCreator.isActivatedToAddPane()) {
             tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
             tableManagament.addComponentClick();
-
         }
     }
 }

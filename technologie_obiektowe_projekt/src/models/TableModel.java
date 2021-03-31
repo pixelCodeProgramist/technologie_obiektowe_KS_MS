@@ -119,6 +119,33 @@ public class TableModel {
         xTableView.setItems(data);
     }
 
+    public void updateData(XTableView xTableView, boolean isUpdatedPK){
+        List list = new ArrayList(xTableView.getItems());
+        if(isUpdatedPK) {
+            xTableView.getItems().forEach(pk -> {
+                if (!pk.equals(this) && ((TableModel) pk).isPrimaryKey()) {
+                    ((TableModel) pk).setPrimaryForeignNoneKey(null);
+                    ((TableModel) pk).setPrimaryKey(false);
+                    int index = list.indexOf(pk);
+                    list.remove(index);
+                    TableModel t = new TableModel(((TableModel) pk).getId(), ((TableModel) pk).getType(), ((TableModel) pk).getPrimaryForeignNoneKey());
+                    list.add(index, t);
+                }
+            });
+        }
+        int index = list.indexOf(this);
+        list.remove(this);
+        TableModel t = new TableModel(getId(),getType(),getPrimaryForeignNoneKey());
+        t.setPrimaryKey(isPrimaryKey());
+        t.setForeignKey(isForeignKey());
+        t.setUnique(isUnique());
+        t.setNotNull(isNotNull());
+        list.add(index,t);
+        ObservableList data = FXCollections.observableList(list);
+        xTableView.setItems(data);
+    }
+
+
 
     @Override
     public String toString() {

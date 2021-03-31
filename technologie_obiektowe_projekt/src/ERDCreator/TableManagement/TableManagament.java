@@ -23,6 +23,7 @@ public class TableManagament extends TableApperance {
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
     private Pane content;
+    private boolean changeStateOfRow = false;
 
 
     public TableManagament() {
@@ -62,10 +63,6 @@ public class TableManagament extends TableApperance {
     public void paneOnMouseMovedEventHandler(MouseEvent event) {
 
         nodes.forEach(moveableNodeModel -> {
-
-
-
-
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
@@ -80,6 +77,9 @@ public class TableManagament extends TableApperance {
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
                 expandContextMenu(mp, moveableNodeModel);
             });
+
+
+
 
         });
     }
@@ -138,24 +138,16 @@ public class TableManagament extends TableApperance {
                 }
                 if (i == 3) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-
-
-                         model.getxTableView().getItems().forEach(pk->{
-                             if(!pk.equals(selectedTableModel)&& ((TableModel) pk).isPrimaryKey()){
-                                 ((TableModel) pk).setPrimaryForeignNoneKey(null);
-                                 ((TableModel) pk).setPrimaryKey(false);
-                             }
-                         });
-
                         selectedTableModel.setPrimaryKey(!selectedTableModel.isPrimaryKey());
                         if(selectedTableModel.isPrimaryKey()) {
                             try {
                                 Model model2 = new Model("images/keys/gold.png", "");
                                 selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-
                                 selectedTableModel.setForeignKey(false);
                                 selectedTableModel.setNotNull(true);
                                 selectedTableModel.setUnique(true);
+                                selectedTableModel.updateData(model.getxTableView(),true);
+
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }
@@ -174,11 +166,13 @@ public class TableManagament extends TableApperance {
                                 selectedTableModel.setPrimaryKey(false);
                                 selectedTableModel.setNotNull(false);
                                 selectedTableModel.setUnique(false);
+                                selectedTableModel.updateData(model.getxTableView(),false);
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }
                         }else {
                             selectedTableModel.setPrimaryForeignNoneKey(null);
+                            selectedTableModel.updateData(model.getxTableView(),false);
                         }
                     });
                 }
@@ -197,6 +191,7 @@ public class TableManagament extends TableApperance {
                 }
             }
         }
+
         workingPane.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             model.getContextMenu().hide();
         });
