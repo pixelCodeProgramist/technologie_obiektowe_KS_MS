@@ -147,7 +147,9 @@ public class TableModel {
                     list.remove(index);
                     TableModel t = new TableModel(((TableModel) pk).getId(), ((TableModel) pk).getType(),
                             ((TableModel) pk).getPrimaryForeignNoneKey(),((TableModel) pk).additional);
+                    t.setAdditional("");
                     list.add(index, t);
+
                 }
             });
         }
@@ -158,6 +160,7 @@ public class TableModel {
         t.setForeignKey(isForeignKey());
         t.setUnique(isUnique());
         t.setNotNull(isNotNull());
+        t.setAdditional("U/NN");
         list.add(index,t);
         ObservableList data = FXCollections.observableList(list);
         xTableView.setItems(data);

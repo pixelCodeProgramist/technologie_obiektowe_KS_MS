@@ -89,24 +89,24 @@ public class TableManagament extends TableApperance {
         if (mp.isSecondaryButtonDown()) {
             TableModel selectedTableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
             ((CheckMenuItem) model.getContextMenu().getItems().get(3)).setSelected(selectedTableModel.isPrimaryKey());
-            ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
-            ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isUnique());
-            ((CheckMenuItem) model.getContextMenu().getItems().get(6)).setSelected(selectedTableModel.isNotNull());
+            //((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
+            ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isUnique());
+            ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
-            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
-            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
-            if(primaryKeyChecked) model.getContextMenu().getItems().get(6).setVisible(false);
-            else model.getContextMenu().getItems().get(6).setVisible(true);
-            if (primaryKeyChecked || foreignKeyChecked) {
-                model.getContextMenu().getItems().get(5).setVisible(false);
-            }else {
-                model.getContextMenu().getItems().get(5).setVisible(true);
-            }
+//            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
+//            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
+//            if(primaryKeyChecked) model.getContextMenu().getItems().get(5).setVisible(false);
+//            else model.getContextMenu().getItems().get(5).setVisible(true);
+//            if (primaryKeyChecked || foreignKeyChecked) {
+//                model.getContextMenu().getItems().get(4).setVisible(false);
+//            }else {
+//                model.getContextMenu().getItems().get(4).setVisible(true);
+//            }
             for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
 
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("<nazwa>", "INT", null,"");
+                        TableModel tableModel = new TableModel("nazwa", "INT", null,"");
                         tableModel.assignPrimaryKey(model.getxTableView());
                         model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
                         model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
@@ -140,7 +140,7 @@ public class TableManagament extends TableApperance {
                 }
                 if (i == 3) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        selectedTableModel.setPrimaryKey(!selectedTableModel.isPrimaryKey());
+                        selectedTableModel.setPrimaryKey(true);
                         if(selectedTableModel.isPrimaryKey()) {
                             try {
                                 Model model2 = new Model("images/keys/gold.png", "");
@@ -158,27 +158,27 @@ public class TableManagament extends TableApperance {
                         }
                     });
                 }
+//                if (i == 4) {
+//                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
+//                        selectedTableModel.setForeignKey(!selectedTableModel.isForeignKey());
+//                        if(selectedTableModel.isForeignKey()) {
+//                            try {
+//                                Model model2 = new Model("images/keys/gray.png", "");
+//                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
+//                                selectedTableModel.setPrimaryKey(false);
+//                                selectedTableModel.setNotNull(false);
+//                                selectedTableModel.setUnique(false);
+//                                selectedTableModel.updateDataKey(model.getxTableView(),false);
+//                            } catch (FileNotFoundException fileNotFoundException) {
+//                                fileNotFoundException.printStackTrace();
+//                            }
+//                        }else {
+//                            selectedTableModel.setPrimaryForeignNoneKey(null);
+//                            selectedTableModel.updateDataKey(model.getxTableView(),false);
+//                        }
+//                    });
+//                }
                 if (i == 4) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        selectedTableModel.setForeignKey(!selectedTableModel.isForeignKey());
-                        if(selectedTableModel.isForeignKey()) {
-                            try {
-                                Model model2 = new Model("images/keys/gray.png", "");
-                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-                                selectedTableModel.setPrimaryKey(false);
-                                selectedTableModel.setNotNull(false);
-                                selectedTableModel.setUnique(false);
-                                selectedTableModel.updateDataKey(model.getxTableView(),false);
-                            } catch (FileNotFoundException fileNotFoundException) {
-                                fileNotFoundException.printStackTrace();
-                            }
-                        }else {
-                            selectedTableModel.setPrimaryForeignNoneKey(null);
-                            selectedTableModel.updateDataKey(model.getxTableView(),false);
-                        }
-                    });
-                }
-                if (i == 5) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         String additional = selectedTableModel.getAdditional();
                         selectedTableModel.setUnique(!selectedTableModel.isUnique());
@@ -205,7 +205,7 @@ public class TableManagament extends TableApperance {
                     });
                 }
 
-                if (i == 6) {
+                if (i == 5) {
 
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         StringBuilder additional = new StringBuilder(selectedTableModel.getAdditional());
@@ -295,14 +295,12 @@ public class TableManagament extends TableApperance {
         MenuItem menuItem3 = new MenuItem("Usuń tabele");
         CheckMenuItem menuItem4 = new CheckMenuItem("Primary key");
         menuItem4.setSelected(true);
-        CheckMenuItem menuItem5 = new CheckMenuItem("Foreign key");
-        menuItem5.setSelected(false);
         CheckMenuItem menuItem6 = new CheckMenuItem("Unique");
         menuItem6.setSelected(true);
         CheckMenuItem menuItem7 = new CheckMenuItem("Not null");
         menuItem7.setSelected(true);
 
-        contextMenu.getItems().addAll(menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7);
+        contextMenu.getItems().addAll(menuItem, menuItem2, menuItem3, menuItem4, menuItem6, menuItem7);
         m.setContextMenu(contextMenu);
     }
 
