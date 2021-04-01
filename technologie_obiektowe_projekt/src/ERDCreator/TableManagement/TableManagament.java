@@ -41,7 +41,7 @@ public class TableManagament extends TableApperance {
         newLoadedPane = FXMLLoader.load(getClass().getResource("../../ERDCreator/resources/MoveableNode.fxml"));
         HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
         Model model = new Model("images/keys/gold.png", "");
-        TableModel tableModel = new TableModel("id", "INT", model.getImageView(20, 20));
+        TableModel tableModel = new TableModel("id", "INT", model.getImageView(20, 20),"U/NN");
         tableModel.setPrimaryKey(true);
         tableModel.setForeignKey(false);
         tableModel.setNotNull(true);
@@ -106,12 +106,13 @@ public class TableManagament extends TableApperance {
 
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("<nazwa>", "<typ>", null);
+                        TableModel tableModel = new TableModel("<nazwa>", "<typ>", null,"");
                         tableModel.assignPrimaryKey(model.getxTableView());
                         model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
                         model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
                         model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
                         model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
+                        if(model.getxTableView().getItems().size() > 1) model.getContextMenu().getItems().get(1).setVisible(true);
                     });
                 }
                 if (i == 1) {
@@ -146,7 +147,7 @@ public class TableManagament extends TableApperance {
                                 selectedTableModel.setForeignKey(false);
                                 selectedTableModel.setNotNull(true);
                                 selectedTableModel.setUnique(true);
-                                selectedTableModel.updateData(model.getxTableView(),true);
+                                selectedTableModel.updateDataKey(model.getxTableView(),true);
 
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
@@ -166,26 +167,63 @@ public class TableManagament extends TableApperance {
                                 selectedTableModel.setPrimaryKey(false);
                                 selectedTableModel.setNotNull(false);
                                 selectedTableModel.setUnique(false);
-                                selectedTableModel.updateData(model.getxTableView(),false);
+                                selectedTableModel.updateDataKey(model.getxTableView(),false);
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }
                         }else {
                             selectedTableModel.setPrimaryForeignNoneKey(null);
-                            selectedTableModel.updateData(model.getxTableView(),false);
+                            selectedTableModel.updateDataKey(model.getxTableView(),false);
                         }
                     });
                 }
                 if (i == 5) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        String additional = selectedTableModel.getAdditional();
                         selectedTableModel.setUnique(!selectedTableModel.isUnique());
+                        if(selectedTableModel.isUnique()){
+                            if(!additional.isEmpty()){
+                                StringBuilder stringBuilder = new StringBuilder("U/");
+                                stringBuilder.append(additional);
+                                selectedTableModel.setAdditional(stringBuilder.toString());
+                                additional = stringBuilder.toString();
+                            }else {
+                                selectedTableModel.setAdditional("U");
+                            }
+                        }else {
+                            String [] arr = additional.split("/");
+                            if(arr.length==2) {
+                                if(selectedTableModel.isUnique())
+                                    selectedTableModel.setAdditional(arr[0]);
+                                else selectedTableModel.setAdditional(arr[1]);
+                            }
+                            else selectedTableModel.setAdditional("");
+                        }
+
+                        selectedTableModel.updateData(model.getxTableView());
                     });
                 }
 
                 if (i == 6) {
 
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                        StringBuilder additional = new StringBuilder(selectedTableModel.getAdditional());
                         selectedTableModel.setNotNull(!selectedTableModel.isNotNull());
+                        if(selectedTableModel.isNotNull()){
+                            if(!additional.toString().isEmpty()){
+                                String s ="/NN";
+                                additional.append(s);
+                                selectedTableModel.setAdditional(additional.toString());
+                            }else {
+                                selectedTableModel.setAdditional("NN");
+                            }
+                        }else {
+                            String [] arr = additional.toString().split("/");
+                            if(arr.length==2)
+                                selectedTableModel.setAdditional(arr[0]);
+                            else selectedTableModel.setAdditional("");
+                        }
+                        selectedTableModel.updateData(model.getxTableView());
                     });
 
                 }

@@ -19,12 +19,14 @@ public class TableModel {
     private String id;
     private String type;
     private ImageView primaryForeignNoneKey;
+    private String additional;
     private boolean primaryKey, foreignKey, isUnique, isNotNull;
 
-    public TableModel(String id, String type,ImageView primaryForeignNoneKey) {
+    public TableModel(String id, String type,ImageView primaryForeignNoneKey,String additional) {
         this.id = id;
         this.type = type;
         this.primaryForeignNoneKey = primaryForeignNoneKey;
+        this.additional = additional;
     }
 
     public ImageView getPrimaryForeignNoneKey() {
@@ -84,6 +86,14 @@ public class TableModel {
         this.type = type;
     }
 
+    public String getAdditional() {
+        return additional;
+    }
+
+    public void setAdditional(String additional) {
+        this.additional = additional;
+    }
+
     public ObservableList<?> getColumns(){
 
         TableColumn keyColumn = new TableColumn("id");
@@ -92,6 +102,7 @@ public class TableModel {
         keyColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         keyColumn.setMinWidth(25);
         keyColumn.setMaxWidth(25);
+
         TableColumn typeColumn = new TableColumn("type");
         typeColumn.setCellValueFactory(new PropertyValueFactory("type"));
         typeColumn.setMinWidth(35);
@@ -103,10 +114,16 @@ public class TableModel {
         primaryForeignNoneKeyColumn.setMinWidth(35);
         primaryForeignNoneKeyColumn.setMaxWidth(35);
 
+        TableColumn additionalColumn = new TableColumn("additional");
+        additionalColumn.setCellValueFactory(new PropertyValueFactory("additional"));
+        additionalColumn.setMinWidth(50);
+        additionalColumn.setMaxWidth(50);
+
         List list = new ArrayList();
         list.add(keyColumn);
         list.add(typeColumn);
         list.add(primaryForeignNoneKeyColumn);
+        list.add(additionalColumn);
         return FXCollections.observableList(list);
     }
 
@@ -119,7 +136,7 @@ public class TableModel {
         xTableView.setItems(data);
     }
 
-    public void updateData(XTableView xTableView, boolean isUpdatedPK){
+    public void updateDataKey(XTableView xTableView, boolean isUpdatedPK){
         List list = new ArrayList(xTableView.getItems());
         if(isUpdatedPK) {
             xTableView.getItems().forEach(pk -> {
@@ -128,14 +145,15 @@ public class TableModel {
                     ((TableModel) pk).setPrimaryKey(false);
                     int index = list.indexOf(pk);
                     list.remove(index);
-                    TableModel t = new TableModel(((TableModel) pk).getId(), ((TableModel) pk).getType(), ((TableModel) pk).getPrimaryForeignNoneKey());
+                    TableModel t = new TableModel(((TableModel) pk).getId(), ((TableModel) pk).getType(),
+                            ((TableModel) pk).getPrimaryForeignNoneKey(),((TableModel) pk).additional);
                     list.add(index, t);
                 }
             });
         }
         int index = list.indexOf(this);
         list.remove(this);
-        TableModel t = new TableModel(getId(),getType(),getPrimaryForeignNoneKey());
+        TableModel t = new TableModel(getId(),getType(),getPrimaryForeignNoneKey(),getAdditional());
         t.setPrimaryKey(isPrimaryKey());
         t.setForeignKey(isForeignKey());
         t.setUnique(isUnique());
@@ -145,7 +163,19 @@ public class TableModel {
         xTableView.setItems(data);
     }
 
-
+    public void updateData(XTableView xTableView){
+        List list = new ArrayList(xTableView.getItems());
+        int index = list.indexOf(this);
+        list.remove(this);
+        TableModel t = new TableModel(getId(),getType(),getPrimaryForeignNoneKey(),getAdditional());
+        t.setPrimaryKey(isPrimaryKey());
+        t.setForeignKey(isForeignKey());
+        t.setUnique(isUnique());
+        t.setNotNull(isNotNull());
+        list.add(index,t);
+        ObservableList data = FXCollections.observableList(list);
+        xTableView.setItems(data);
+    }
 
     @Override
     public String toString() {
@@ -153,6 +183,7 @@ public class TableModel {
                 "id='" + id + '\'' +
                 ", type='" + type + '\'' +
                 ", primaryForeignNoneKey=" + primaryForeignNoneKey +
+                ", additional='" + additional + '\'' +
                 ", primaryKey=" + primaryKey +
                 ", foreignKey=" + foreignKey +
                 ", isUnique=" + isUnique +
