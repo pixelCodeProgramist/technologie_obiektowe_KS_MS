@@ -114,7 +114,7 @@ public class TableApperance {
                                     if(arrStr[1].matches("\\d+")&&!arrStr[1].startsWith("0")) tableModel.setType((String) cellEditEvent.getNewValue());
                                     else tableModel.setType((String) cellEditEvent.getOldValue());
                                 }else {
-                                    if(arrStr.length==1&&arrStr2.length==1) tableModel.setType(typeString);
+                                    if(typeString.toUpperCase().equals(str)) tableModel.setType(typeString);
                                     else tableModel.setType((String) cellEditEvent.getOldValue());
                                 }
                             }
