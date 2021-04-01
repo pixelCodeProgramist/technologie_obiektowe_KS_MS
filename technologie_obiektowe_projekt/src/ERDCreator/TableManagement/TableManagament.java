@@ -106,12 +106,13 @@ public class TableManagament extends TableApperance {
 
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("<nazwa>", "<typ>", null,"");
+                        TableModel tableModel = new TableModel("<nazwa>", "INT", null,"");
                         tableModel.assignPrimaryKey(model.getxTableView());
                         model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
                         model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
                         model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
                         model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
+                        selectedTableModel.updateData(model.getxTableView());
                         if(model.getxTableView().getItems().size() > 1) model.getContextMenu().getItems().get(1).setVisible(true);
                     });
                 }

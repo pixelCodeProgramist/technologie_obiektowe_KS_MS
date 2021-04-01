@@ -93,6 +93,7 @@ public class TableApperance {
         xTableView.getColumns().stream().forEach(column -> {
             TableColumn tableColumn = (TableColumn) column;
             tableColumn.setOnEditCommit(comm -> {
+
                 double tableWidth = 0;
                 TableColumn.CellEditEvent cellEditEvent = (TableColumn.CellEditEvent) comm;
                 TableModel tableModel = (TableModel)
@@ -122,6 +123,7 @@ public class TableApperance {
                             }
                         });
                     }
+                    tableModel.updateData(xTableView);
                 }
 
                 for (int i = 0; i < xTableView.getItems().size(); i++) {
