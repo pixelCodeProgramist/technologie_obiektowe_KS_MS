@@ -10,7 +10,7 @@
             <HBox layoutX="451.0" layoutY="675.0" prefHeight="47.0" prefWidth="482.0" spacing="25">
                <children>
                   <Button mnemonicParsing="false" onMouseClicked="#backToMenu" prefHeight="34.0" prefWidth="97.0" text="Wróć" />
-                  <Button mnemonicParsing="false" prefHeight="34.0" prefWidth="154.0" text="Wygeneruj sql" />
+                  <Button mnemonicParsing="false" onMouseClicked="#generateSQL" prefHeight="34.0" prefWidth="154.0" text="Wygeneruj sql" />
                   <Button mnemonicParsing="false" prefHeight="34.0" prefWidth="154.0" text="Wyeksportuj" />
                </children>
             </HBox>

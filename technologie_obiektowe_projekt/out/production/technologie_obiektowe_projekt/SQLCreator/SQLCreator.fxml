@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="870.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane prefHeight="870.0" prefWidth="1000.0">
+         <children>
+            <HBox layoutX="451.0" layoutY="675.0" prefHeight="47.0" prefWidth="482.0" spacing="25">
+               <children>
+                  <Button mnemonicParsing="false" onMouseClicked="#backToWorkspace" prefHeight="34.0" prefWidth="97.0" text="Wróć" />
+               </children>
+            </HBox>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

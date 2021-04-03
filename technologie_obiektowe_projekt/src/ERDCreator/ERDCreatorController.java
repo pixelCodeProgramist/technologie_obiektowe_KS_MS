@@ -3,6 +3,7 @@ package ERDCreator;
 import Config.Configuration;
 import ERDCreator.LeftPanel.LeftPanelCreator;
 import ERDCreator.TableManagement.TableManagament;
+import SQLCreator.SQLCreatorController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TreeView;
@@ -27,9 +28,15 @@ public class ERDCreatorController {
     @FXML
     private ScrollPane workingPane;
 
+    public ERDCreatorController(Set<MoveableNodeModel> nodes) {
+        this.nodes = nodes;
+    }
+
+    public ERDCreatorController() {
+    }
 
     public void initialize() throws FileNotFoundException {
-        nodes = new HashSet<>();
+        if(nodes==null) nodes = new HashSet<>();
         leftPanelCreator = new LeftPanelCreator(idTabels);
         leftPanelCreator.loadTreeItems();
         tableManagament = new TableManagament();
@@ -59,6 +66,14 @@ public class ERDCreatorController {
         if (leftPanelCreator.isActivatedToAddPane()) {
             tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
             tableManagament.addComponentClick();
+        }
+    }
+
+    @FXML
+    public void generateSQL(MouseEvent mouseEvent) throws IOException {
+        if(nodes.size()>0) {
+            Configuration configuration = new Configuration();
+            configuration.changeScene("../SQLCreator/SQLCreator.fxml", mouseEvent, new SQLCreatorController(nodes));
         }
     }
 }

@@ -23,7 +23,7 @@ public class TableManagament extends TableApperance {
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
     private Pane content;
-    private boolean changeStateOfRow = false;
+
 
 
     public TableManagament() {
@@ -34,6 +34,10 @@ public class TableManagament extends TableApperance {
         this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
+        this.nodes.forEach(e->{
+            content.getChildren().add(e.getAnchorPane());
+        });
+
         setChosenModel(chosenModel);
     }
 
