@@ -18,7 +18,6 @@ public class SQLCreatorController{
 
     @FXML
     public void backToWorkspace(MouseEvent mouseEvent) throws IOException {
-
         Configuration configuration = new Configuration();
         configuration.changeScene("../ERDCreator/ERDCreator.fxml", mouseEvent, new ERDCreatorController(nodes));
     }
