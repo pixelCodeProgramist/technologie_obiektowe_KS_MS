@@ -34,10 +34,6 @@ public class TableManagament extends TableApperance {
         this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
-        this.nodes.forEach(e->{
-            content.getChildren().add(e.getAnchorPane());
-        });
-
         setChosenModel(chosenModel);
     }
 

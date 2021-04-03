@@ -36,7 +36,7 @@ public class NodeSplitter {
             }
             if(!row.equals(rowsOfTable.get(rowsOfTable.size()-1))) query.append(",\n");
         });
-        query.append(");");
+        query.append(");\n\n");
         return query.toString();
     }
 

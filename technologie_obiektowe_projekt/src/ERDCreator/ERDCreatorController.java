@@ -46,6 +46,9 @@ public class ERDCreatorController {
         this.workingPane.setContent(content);
         this.workingPane.setPannable(true);
         tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
+        this.nodes.forEach(e->{
+            content.getChildren().add(e.getAnchorPane());
+        });
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
     }
 
