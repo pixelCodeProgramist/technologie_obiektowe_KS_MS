@@ -12,6 +12,9 @@
                   <Button mnemonicParsing="false" onMouseClicked="#backToWorkspace" prefHeight="34.0" prefWidth="97.0" text="Wróć" />
                </children>
             </HBox>
+            <TextArea fx:id="textAreaID" layoutX="27.0" layoutY="23.0" prefHeight="633.0" prefWidth="957.0"
+                      style="-fx-control-inner-background: lightgray;
+                      -fx-highlight-text-fill: #000000;" />
          </children>
       </Pane>
    </children>
