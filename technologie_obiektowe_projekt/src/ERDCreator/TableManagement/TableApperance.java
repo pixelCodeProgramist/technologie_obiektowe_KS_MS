@@ -32,8 +32,9 @@ public class TableApperance {
         this.chosenModel = chosenModel;
     }
     private List<String> prohibitedTableNames = new ArrayList<>(Arrays.asList("CREATE","DISTINCT","INSERT","INTO","SELECT","TABLE","*","VALUES","NULL","IS","DROP","ALTER","CONSTRAINT"));
-    private List<String> availableTypeNamesWithBracket = new ArrayList<>(Arrays.asList("INT","VARCHAR","TINYINT","SMALLINT","MEDIUMINT","BIGINT","DECIMAL","FLOAT","DOUBLE","DATE","REAL","BIT","CHAR","BINARY","VARBINARY","ENUM","SET","GEOMETRY","POINT","LINESTRING","POLYGON","MULTIPOINT","MULTILINESTRING","MULTIPOLYGON","GEOMETRYCOLLECTION","JSOM"));
-    private List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("TEXT","DATE","BOOLEAN","SERIAL","DATETIME","TIMESTAMP","TIME","YEAR","TINYTEXT","MEDIUMTEXT","LONGTEXT","TINYBLOB","BLOB","MEDIUMBLOB","LONGBLOB"));
+    private List<String> availableTypeNamesWithBracket = new ArrayList<>(Arrays.asList("BIT","BOOLEAN","CHAR","DATETIME2","DECIMAL","DECFLOAT","DOUBLE","FLOAT","INTERVAL DAY TO SECOND","INTERVAL YEAR TO MONTH","MONEY","NCHAR","NUMERIC","NVARCHAR","RAW","SMALLMONEY","SYSNAME","TIMESTAMP WITH LOCAL TIME ZONE","TIMESTAMP WITH TIME ZONE","TIMESTAMP","UNIQUEIDENTIFIER","UROWID","VARCHAR","STRING"));
+    private List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO","BFile","BIGINT","BINARY","BINARY DOUBLE","BINARY FLOAT","BLOB","CLOB","DATALINK","DATE","DATETIME","GRAPHIC","HTTPURITYPE","IMAGE","INTEGER","LONG CHAR","LONG_RAW","NCLOB","NTEXT","ORDAUDIO","ORDDOC","ORDIMAGE","ORDIMAGE_SIGNATURE","ORDVIDEO","REAL","ROWID","SMALLDATETIME","SMALLINT","SQL_VARIANT","SYS_ANYDATA","SYS_ANYDATASET","SYS_ANYTYPE","TEXT","TINYINT","TIME","URITYPE","VARBINARY","VARGRAPHIC","VIDEO","XDBURITYPE","XMLTYPE","JSON"));
+
     protected String getFirstTextToLabel() {
         if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
             classNumber++;

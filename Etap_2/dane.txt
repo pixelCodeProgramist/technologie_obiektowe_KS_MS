@@ -26,3 +26,4 @@ Na następny etap postaram się:
 przystąpię do generowania kodu z połączeń klas. Jeśli jeszcze starczy czasu to
 postaram się zapisać diagram do pliku oraz dodam opcję wczytania diagramu.
 Ostatecznym krokiem będzie generowanie kodu sql i przygotowanie do obrony projektu.
+DEFERRABLE INITIALLY DEFERRED

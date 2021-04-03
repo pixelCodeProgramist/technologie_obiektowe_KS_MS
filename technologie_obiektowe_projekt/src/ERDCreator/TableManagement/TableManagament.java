@@ -41,7 +41,7 @@ public class TableManagament extends TableApperance {
         newLoadedPane = FXMLLoader.load(getClass().getResource("../../ERDCreator/resources/MoveableNode.fxml"));
         HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
         Model model = new Model("images/keys/gold.png", "");
-        TableModel tableModel = new TableModel("id", "INT", model.getImageView(20, 20),"U/NN");
+        TableModel tableModel = new TableModel("id", "NUMBER", model.getImageView(20, 20),"U/NN");
         tableModel.setPrimaryKey(true);
         tableModel.setForeignKey(false);
         tableModel.setNotNull(true);
@@ -93,20 +93,27 @@ public class TableManagament extends TableApperance {
             ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isUnique());
             ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
-//            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
+            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
 //            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
-//            if(primaryKeyChecked) model.getContextMenu().getItems().get(5).setVisible(false);
-//            else model.getContextMenu().getItems().get(5).setVisible(true);
+            if(primaryKeyChecked){
+                model.getContextMenu().getItems().get(4).setVisible(false);
+                model.getContextMenu().getItems().get(5).setVisible(false);
+            }
+            else{
+                model.getContextMenu().getItems().get(4).setVisible(true);
+                model.getContextMenu().getItems().get(5).setVisible(true);
+            }
 //            if (primaryKeyChecked || foreignKeyChecked) {
 //                model.getContextMenu().getItems().get(4).setVisible(false);
 //            }else {
 //                model.getContextMenu().getItems().get(4).setVisible(true);
 //            }
+
             for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
 
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("nazwa", "INT", null,"");
+                        TableModel tableModel = new TableModel("nazwa", "NUMBER", null,"");
                         tableModel.assignPrimaryKey(model.getxTableView());
                         model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
                         model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
