@@ -1,14 +1,10 @@
 package ERDCreator.TableManagement;
 
 import ERDCreator.resources.XTableView;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -17,10 +13,8 @@ import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TableApperance {
@@ -28,6 +22,7 @@ public class TableApperance {
     private int classNumber = 0;
     private int tabelNumber = 0;
     protected boolean isLabelOfTableClicked = false;
+
     protected void setChosenModel(Optional<Model> chosenModel) {
         this.chosenModel = chosenModel;
     }
@@ -62,7 +57,10 @@ public class TableApperance {
     }
 
 
-    protected void setLabelTextIfClicked(MoveableNodeModel e, ScrollPane workingPane, TextArea logTextAreaID) {
+    protected void setLabelTextIfClicked(Set<MoveableNodeModel> nodes, MoveableNodeModel e, ScrollPane workingPane, TextArea logTextAreaID) {
+        Set<MoveableNodeModel> copyNodes = new HashSet<>(nodes);
+        copyNodes.remove(e);
+
         e.getLabel().setOnMouseClicked(event -> {
             this.isLabelOfTableClicked = true;
             Label beforeModificationLabel = e.getLabel();
@@ -74,10 +72,15 @@ public class TableApperance {
 
             workingPane.setOnKeyPressed(ec -> {
                 label.setText(textField.getText());
+                AtomicLong numberOfDuplicateLabelName = new AtomicLong();
+                copyNodes.forEach(node -> {
+                    if(node.getLabel().getText().equals(label.getText())) numberOfDuplicateLabelName.getAndIncrement();
+                });
                 String helpString = label.getText().replaceAll("\\s", "");
                 if (!label.getText().trim().equals("")
                         && helpString.equals(label.getText())
                         && !prohibitedTableNames.contains(helpString.toUpperCase())
+                        && numberOfDuplicateLabelName.get() == 0
                 ) {
                     if (!e.gethBox().getChildren().contains(label)) {
                         e.gethBox().getChildren().remove(textField);
@@ -86,19 +89,24 @@ public class TableApperance {
                         e.gethBox().getChildren().add(label);
                         e.setLabel(label);
                         this.isLabelOfTableClicked = false;
-                        String [] textAreaStringSplit = logTextAreaID.getText().split("\n");
+                        String[] textAreaStringSplit = logTextAreaID.getText().split("\n");
                         StringBuilder newTextArea = new StringBuilder();
-                        for(String text: textAreaStringSplit){
-                            if(!text.startsWith(e.getLabel().getId())&&!text.trim().equals("")) newTextArea.append(text+"\n");
+                        for (String text : textAreaStringSplit) {
+                            if (!text.startsWith(e.getLabel().getId()) && !text.trim().equals(""))
+                                newTextArea.append(text + "\n");
                         }
                         logTextAreaID.setText(newTextArea.toString());
                     }
-                }else {
-                    if(ec.getCode().equals(KeyCode.ENTER))
-                         if(logTextAreaID.getText().equals(""))
-                             logTextAreaID.setText(label.getId()+": " + "Nie zmieniono "+beforeModificationLabel.getText()+" na "+label.getText()+"\n");
-                         else
-                             logTextAreaID.setText(logTextAreaID.getText()+label.getId()+": " + "Nie zmieniono "+beforeModificationLabel.getText()+" na "+label.getText()+"\n");
+                } else {
+                    if (ec.getCode().equals(KeyCode.ENTER))
+                        if (numberOfDuplicateLabelName.get() == 0) {
+                            if (logTextAreaID.getText().equals(""))
+                                logTextAreaID.setText(label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
+                            else
+                                logTextAreaID.setText(logTextAreaID.getText() + label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
+                        } else {
+                            logTextAreaID.setText(logTextAreaID.getText() + label.getId() + ": " + "Tabela o takiej nazwie już istnieje\n");
+                        }
                 }
             });
         });

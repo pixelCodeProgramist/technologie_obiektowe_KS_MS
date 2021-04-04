@@ -12,6 +12,7 @@ import models.TableModel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class TableManagament extends TableApperance {
     private double orgTranslateX, orgTranslateY;
     private Pane content;
     private TextArea logTextAreaID;
-
+    private Map<String,Integer> fieldNameNumberMap;
 
 
     public TableManagament() {
@@ -69,7 +70,7 @@ public class TableManagament extends TableApperance {
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
-                if(!isLabelOfTableClicked) setLabelTextIfClicked(moveableNodeModel, workingPane,logTextAreaID);
+                if(!isLabelOfTableClicked) setLabelTextIfClicked(nodes,moveableNodeModel, workingPane,logTextAreaID);
 
             });
 
