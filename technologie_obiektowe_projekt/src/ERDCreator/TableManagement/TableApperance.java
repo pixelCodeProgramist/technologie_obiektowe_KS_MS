@@ -14,7 +14,6 @@ import models.MoveableNodeModel;
 import models.TableModel;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,7 +29,7 @@ public class TableApperance {
 
     private List<String> prohibitedTableNames = new ArrayList<>(Arrays.asList("CREATE", "DISTINCT", "INSERT", "INTO", "SELECT", "TABLE", "*", "VALUES", "NULL", "IS", "DROP", "ALTER", "CONSTRAINT"));
     private List<String> availableTypeNamesWithBracket = new ArrayList<>(Arrays.asList("BIT", "BOOLEAN", "CHAR", "DATETIME2", "DECIMAL", "DECFLOAT", "DOUBLE", "FLOAT", "INTERVAL DAY TO SECOND", "INTERVAL YEAR TO MONTH", "MONEY", "NCHAR", "NUMERIC", "NVARCHAR", "RAW", "SMALLMONEY", "SYSNAME", "TIMESTAMP WITH LOCAL TIME ZONE", "TIMESTAMP WITH TIME ZONE", "TIMESTAMP", "UNIQUEIDENTIFIER", "UROWID", "VARCHAR", "STRING"));
-    private List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO", "BFile", "BIGINT", "BINARY", "BINARY DOUBLE", "BINARY FLOAT", "BLOB", "CLOB", "DATALINK", "DATE", "DATETIME", "GRAPHIC", "HTTPURITYPE", "IMAGE", "INTEGER", "LONG CHAR", "LONG_RAW", "NCLOB", "NTEXT", "ORDAUDIO", "ORDDOC", "ORDIMAGE", "ORDIMAGE_SIGNATURE", "ORDVIDEO", "REAL", "ROWID", "SMALLDATETIME", "SMALLINT", "SQL_VARIANT", "SYS_ANYDATA", "SYS_ANYDATASET", "SYS_ANYTYPE", "TEXT", "TINYINT", "TIME", "URITYPE", "VARBINARY", "VARGRAPHIC", "VIDEO", "XDBURITYPE", "XMLTYPE", "JSON"));
+    private final List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO", "BFile", "BIGINT", "BINARY", "BINARY DOUBLE", "BINARY FLOAT", "BLOB", "CLOB", "DATALINK", "DATE", "DATETIME", "GRAPHIC", "HTTPURITYPE", "IMAGE", "INTEGER", "LONG CHAR", "LONG_RAW", "NCLOB", "NTEXT", "ORDAUDIO", "ORDDOC", "ORDIMAGE", "ORDIMAGE_SIGNATURE", "ORDVIDEO", "REAL", "ROWID", "SMALLDATETIME", "SMALLINT", "SQL_VARIANT", "SYS_ANYDATA", "SYS_ANYDATASET", "SYS_ANYTYPE", "TEXT", "TINYINT", "TIME", "URITYPE", "VARBINARY", "VARGRAPHIC", "VIDEO", "XDBURITYPE", "XMLTYPE", "JSON"));
 
     protected String getFirstTextToLabel() {
         if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
@@ -75,7 +74,7 @@ public class TableApperance {
                 label.setText(textField.getText());
                 AtomicLong numberOfDuplicateLabelName = new AtomicLong();
                 copyNodes.forEach(node -> {
-                    if(node.getLabel().getText().equals(label.getText())) numberOfDuplicateLabelName.getAndIncrement();
+                    if (node.getLabel().getText().equals(label.getText())) numberOfDuplicateLabelName.getAndIncrement();
                 });
                 String helpString = label.getText().replaceAll("\\s", "");
                 if (!label.getText().trim().equals("")
@@ -94,7 +93,7 @@ public class TableApperance {
                         StringBuilder newTextArea = new StringBuilder();
                         for (String text : textAreaStringSplit) {
                             if (!text.startsWith(e.getLabel().getId()) && !text.trim().equals(""))
-                                newTextArea.append(text + "\n");
+                                newTextArea.append(text).append("\n");
                         }
                         logTextAreaID.setText(newTextArea.toString());
                     }
@@ -114,7 +113,7 @@ public class TableApperance {
     }
 
 
-    protected void setResize(MoveableNodeModel m,TextArea logTextAreaID) {
+    protected void setResize(MoveableNodeModel m, TextArea logTextAreaID) {
         XTableView xTableView = m.getxTableView();
         AtomicReference<Double> max = new AtomicReference<>((double) 10);
         xTableView.getColumns().stream().forEach(column -> {
@@ -126,8 +125,41 @@ public class TableApperance {
                 TableColumn.CellEditEvent cellEditEvent = (TableColumn.CellEditEvent) comm;
                 TableModel tableModel = (TableModel)
                         cellEditEvent.getTableView().getItems().get(cellEditEvent.getTablePosition().getRow());
-                if (cellEditEvent.getTablePosition().getColumn() == 0)
-                    tableModel.setId((String) cellEditEvent.getNewValue());
+                if (cellEditEvent.getTablePosition().getColumn() == 0) {
+                    String rowFieldName = (String) cellEditEvent.getNewValue();
+                    ArrayList<String> fieldNames = new ArrayList<>();
+                    if (!prohibitedTableNames.contains(rowFieldName.toUpperCase())
+                            &&!availableTypeNamesWithBracket.contains(rowFieldName.toUpperCase())
+                            &&!availableTypeNamesWithoutBracket.contains(rowFieldName.toUpperCase())
+                            &&rowFieldName.length()>1
+                            &&!rowFieldName.startsWith("--")) {
+                        xTableView.getItems().forEach(row -> {
+                            fieldNames.add(((TableModel) row).getId());
+                        });
+                        if (!fieldNames.contains(rowFieldName)) {
+                            tableModel.setId((String) cellEditEvent.getNewValue());
+                            String[] splittedLogText = logTextAreaID.getText().split("\n");
+                            StringBuilder newTextArea = new StringBuilder();
+                            for (String text : splittedLogText) {
+                                if (!text.startsWith(m.getxTableView().toString().split(("\\["))[0]) && !text.trim().equals(""))
+                                    newTextArea.append(text + "\n");
+                            }
+                            logTextAreaID.setText(newTextArea.toString());
+                        } else {
+
+                            tableModel.setId((String) cellEditEvent.getOldValue());
+                            logTextAreaID.setText(logTextAreaID.getText() + xTableView.toString().split("\\[")[0] + " :Taka nazwa jest już w tabeli "
+                                    + m.getLabel().getText() + ". Nazwa pola nie została zmieniona z " + tableModel.getId() + " na nazwę " + rowFieldName + "\n");
+                        }
+                    } else {
+
+                        tableModel.setId((String) cellEditEvent.getOldValue());
+
+                        logTextAreaID.setText(logTextAreaID.getText() + xTableView.toString().split("\\[")[0] + " :Niedozwolona nazwa w tabeli "
+                                + m.getLabel().getText() + ". Nazwa pola nie została zmieniona z " + tableModel.getId() + " na nazwę " + rowFieldName + "\n");
+                    }
+                    tableModel.updateData(xTableView);
+                }
                 if (cellEditEvent.getTablePosition().getColumn() == 1) {
                     String typeString = (String) cellEditEvent.getNewValue();
                     if (availableTypeNamesWithoutBracket.contains(typeString.toUpperCase())) {
@@ -141,15 +173,13 @@ public class TableApperance {
                                     arrStr[1] = arrStr[1].substring(0, arrStr[1].length() - 1);
                                     if (arrStr[1].matches("\\d+") && !arrStr[1].startsWith("0")) {
                                         tableModel.setType((String) cellEditEvent.getNewValue());
-                                    }
-                                    else{
+                                    } else {
                                         tableModel.setType((String) cellEditEvent.getOldValue());
                                     }
                                 } else {
                                     if (typeString.toUpperCase().equals(str)) {
                                         tableModel.setType(typeString);
-                                    }
-                                    else{
+                                    } else {
                                         tableModel.setType((String) cellEditEvent.getOldValue());
                                     }
                                 }
@@ -159,11 +189,11 @@ public class TableApperance {
                         });
                     }
 
-                    if(!cellEditEvent.getOldValue().equals(typeString)){
-                         logTextAreaID.setText(logTextAreaID.getText()+m.getxTableView().toString().split("\\[")[0]
-                                 +": nie udało się w tabeli " + m.getLabel().getText() + " zmienić typu "+ cellEditEvent.getOldValue()+" na typ "+typeString+"\n");
-                    }else {
-                        String [] splittedLogText = logTextAreaID.getText().split("\n");
+                    if (!cellEditEvent.getOldValue().equals(typeString)) {
+                        logTextAreaID.setText(logTextAreaID.getText() + m.getxTableView().toString().split("\\[")[0]
+                                + ": nie udało się w tabeli " + m.getLabel().getText() + " zmienić typu " + cellEditEvent.getOldValue() + " na typ " + typeString + "\n");
+                    } else {
+                        String[] splittedLogText = logTextAreaID.getText().split("\n");
                         StringBuilder newTextArea = new StringBuilder();
                         for (String text : splittedLogText) {
                             if (!text.startsWith(m.getxTableView().toString().split(("\\["))[0]) && !text.trim().equals(""))
@@ -202,10 +232,7 @@ public class TableApperance {
                     xTableView.setMinWidth(m.gethBox().getMinWidth());
                     xTableView.setMaxWidth(m.gethBox().getMaxWidth());
                 }
-
-
             });
-
         });
     }
 }
