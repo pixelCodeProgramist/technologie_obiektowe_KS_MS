@@ -87,7 +87,8 @@ public class TableManagament extends TableApperance {
             });
 
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
-                expandContextMenu(mp, moveableNodeModel);
+                if(moveableNodeModel!=null)
+                    expandContextMenu(mp, moveableNodeModel);
             });
 
 
