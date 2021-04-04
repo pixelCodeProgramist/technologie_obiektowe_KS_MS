@@ -99,99 +99,100 @@ public class TableManagament extends TableApperance {
     private void expandContextMenu(MouseEvent mp, MoveableNodeModel model) {
         if (mp.isSecondaryButtonDown()) {
             TableModel selectedTableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
-            ((CheckMenuItem) model.getContextMenu().getItems().get(3)).setSelected(selectedTableModel.isPrimaryKey());
-            //((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
-            ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isUnique());
-            ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
-            model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
-            boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
+            if (selectedTableModel != null) {
+                ((CheckMenuItem) model.getContextMenu().getItems().get(3)).setSelected(selectedTableModel.isPrimaryKey());
+                //((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
+                ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isUnique());
+                ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
+                model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
+                boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
 //            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
-            if (primaryKeyChecked) {
-                model.getContextMenu().getItems().get(4).setVisible(false);
-                model.getContextMenu().getItems().get(5).setVisible(false);
-            } else {
-                model.getContextMenu().getItems().get(4).setVisible(true);
-                model.getContextMenu().getItems().get(5).setVisible(true);
-            }
+                if (primaryKeyChecked) {
+                    model.getContextMenu().getItems().get(4).setVisible(false);
+                    model.getContextMenu().getItems().get(5).setVisible(false);
+                } else {
+                    model.getContextMenu().getItems().get(4).setVisible(true);
+                    model.getContextMenu().getItems().get(5).setVisible(true);
+                }
 //            if (primaryKeyChecked || foreignKeyChecked) {
 //                model.getContextMenu().getItems().get(4).setVisible(false);
 //            }else {
 //                model.getContextMenu().getItems().get(4).setVisible(true);
 //            }
 
-            for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
+                for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
 
-                if (i == 0) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        AtomicInteger highestNumberName= new AtomicInteger(1);
-                        model.getxTableView().getItems().forEach(row->{
-                            String id = ((TableModel)row).getId();
-                            if(id.startsWith("nazwa")){
-                                String [] splittedId = id.split("nazwa");
-                                if(splittedId.length>1){
-                                    String number = splittedId[1];
-                                    Pattern pattern = Pattern.compile("-?\\d+");
-                                    if(pattern.matcher(number).matches()){
-                                       int numberInt = Integer.parseInt(number);
-                                       numberInt++;
-                                       if(numberInt> highestNumberName.get()) highestNumberName.set(numberInt);
+                    if (i == 0) {
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            AtomicInteger highestNumberName = new AtomicInteger(1);
+                            model.getxTableView().getItems().forEach(row -> {
+                                String id = ((TableModel) row).getId();
+                                if (id.startsWith("nazwa")) {
+                                    String[] splittedId = id.split("nazwa");
+                                    if (splittedId.length > 1) {
+                                        String number = splittedId[1];
+                                        Pattern pattern = Pattern.compile("-?\\d+");
+                                        if (pattern.matcher(number).matches()) {
+                                            int numberInt = Integer.parseInt(number);
+                                            numberInt++;
+                                            if (numberInt > highestNumberName.get()) highestNumberName.set(numberInt);
+                                        }
                                     }
                                 }
+                            });
+                            TableModel tableModel = new TableModel("nazwa" + highestNumberName.get(), "NUMBER", null, "");
+                            model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
+                            model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
+                            model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
+                            model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
+                            tableModel.assignPrimaryKey(model.getxTableView());
+                            selectedTableModel.updateData(model.getxTableView());
+                            if (model.getxTableView().getItems().size() > 1)
+                                model.getContextMenu().getItems().get(1).setVisible(true);
+                        });
+                    }
+                    if (i == 1) {
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            if (model.getxTableView().getItems().size() > 1) {
+                                TableModel tableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
+                                model.getxTableView().getItems().remove(tableModel);
+                                model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() - 30);
+                                model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() - 30);
+                                model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() - 70);
+                                model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() - 70);
+                                model.getContextMenu().getItems().get(1).setVisible(true);
+                            } else {
+                                model.getContextMenu().getItems().get(1).setVisible(false);
                             }
                         });
-                        TableModel tableModel = new TableModel("nazwa"+highestNumberName.get(), "NUMBER", null, "");
-                        model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
-                        model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
-                        model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
-                        model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
-                        tableModel.assignPrimaryKey(model.getxTableView());
-                        selectedTableModel.updateData(model.getxTableView());
-                        if (model.getxTableView().getItems().size() > 1)
-                            model.getContextMenu().getItems().get(1).setVisible(true);
-                    });
-                }
-                if (i == 1) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        if (model.getxTableView().getItems().size() > 1) {
-                            TableModel tableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
-                            model.getxTableView().getItems().remove(tableModel);
-                            model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() - 30);
-                            model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() - 30);
-                            model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() - 70);
-                            model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() - 70);
-                            model.getContextMenu().getItems().get(1).setVisible(true);
-                        } else {
-                            model.getContextMenu().getItems().get(1).setVisible(false);
-                        }
-                    });
-                }
-                if (i == 2) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        Pane pane = (Pane) workingPane.getContent();
-                        pane.getChildren().remove(model.getAnchorPane());
-                        nodes.remove(model);
-                    });
-                }
-                if (i == 3) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        selectedTableModel.setPrimaryKey(true);
-                        if (selectedTableModel.isPrimaryKey()) {
-                            try {
-                                Model model2 = new Model("images/keys/gold.png", "");
-                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-                                selectedTableModel.setForeignKey(false);
-                                selectedTableModel.setNotNull(true);
-                                selectedTableModel.setUnique(true);
-                                selectedTableModel.updateDataKey(model.getxTableView(), true);
+                    }
+                    if (i == 2) {
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            Pane pane = (Pane) workingPane.getContent();
+                            pane.getChildren().remove(model.getAnchorPane());
+                            nodes.remove(model);
+                        });
+                    }
+                    if (i == 3) {
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            selectedTableModel.setPrimaryKey(true);
+                            if (selectedTableModel.isPrimaryKey()) {
+                                try {
+                                    Model model2 = new Model("images/keys/gold.png", "");
+                                    selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
+                                    selectedTableModel.setForeignKey(false);
+                                    selectedTableModel.setNotNull(true);
+                                    selectedTableModel.setUnique(true);
+                                    selectedTableModel.updateDataKey(model.getxTableView(), true);
 
-                            } catch (FileNotFoundException fileNotFoundException) {
-                                fileNotFoundException.printStackTrace();
+                                } catch (FileNotFoundException fileNotFoundException) {
+                                    fileNotFoundException.printStackTrace();
+                                }
+                            } else {
+                                selectedTableModel.setPrimaryForeignNoneKey(null);
                             }
-                        } else {
-                            selectedTableModel.setPrimaryForeignNoneKey(null);
-                        }
-                    });
-                }
+                        });
+                    }
 //                if (i == 4) {
 //                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
 //                        selectedTableModel.setForeignKey(!selectedTableModel.isForeignKey());
@@ -212,54 +213,55 @@ public class TableManagament extends TableApperance {
 //                        }
 //                    });
 //                }
-                if (i == 4) {
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        String additional = selectedTableModel.getAdditional();
-                        selectedTableModel.setUnique(!selectedTableModel.isUnique());
-                        if (selectedTableModel.isUnique()) {
-                            if (!additional.isEmpty()) {
-                                StringBuilder stringBuilder = new StringBuilder("U/");
-                                stringBuilder.append(additional);
-                                selectedTableModel.setAdditional(stringBuilder.toString());
-                                additional = stringBuilder.toString();
+                    if (i == 4) {
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            String additional = selectedTableModel.getAdditional();
+                            selectedTableModel.setUnique(!selectedTableModel.isUnique());
+                            if (selectedTableModel.isUnique()) {
+                                if (!additional.isEmpty()) {
+                                    StringBuilder stringBuilder = new StringBuilder("U/");
+                                    stringBuilder.append(additional);
+                                    selectedTableModel.setAdditional(stringBuilder.toString());
+                                    additional = stringBuilder.toString();
+                                } else {
+                                    selectedTableModel.setAdditional("U");
+                                }
                             } else {
-                                selectedTableModel.setAdditional("U");
+                                String[] arr = additional.split("/");
+                                if (arr.length == 2) {
+                                    if (selectedTableModel.isUnique())
+                                        selectedTableModel.setAdditional(arr[0]);
+                                    else selectedTableModel.setAdditional(arr[1]);
+                                } else selectedTableModel.setAdditional("");
                             }
-                        } else {
-                            String[] arr = additional.split("/");
-                            if (arr.length == 2) {
-                                if (selectedTableModel.isUnique())
+
+                            selectedTableModel.updateData(model.getxTableView());
+                        });
+                    }
+
+                    if (i == 5) {
+
+                        model.getContextMenu().getItems().get(i).setOnAction(e -> {
+                            StringBuilder additional = new StringBuilder(selectedTableModel.getAdditional());
+                            selectedTableModel.setNotNull(!selectedTableModel.isNotNull());
+                            if (selectedTableModel.isNotNull()) {
+                                if (!additional.toString().isEmpty()) {
+                                    String s = "/NN";
+                                    additional.append(s);
+                                    selectedTableModel.setAdditional(additional.toString());
+                                } else {
+                                    selectedTableModel.setAdditional("NN");
+                                }
+                            } else {
+                                String[] arr = additional.toString().split("/");
+                                if (arr.length == 2)
                                     selectedTableModel.setAdditional(arr[0]);
-                                else selectedTableModel.setAdditional(arr[1]);
-                            } else selectedTableModel.setAdditional("");
-                        }
-
-                        selectedTableModel.updateData(model.getxTableView());
-                    });
-                }
-
-                if (i == 5) {
-
-                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        StringBuilder additional = new StringBuilder(selectedTableModel.getAdditional());
-                        selectedTableModel.setNotNull(!selectedTableModel.isNotNull());
-                        if (selectedTableModel.isNotNull()) {
-                            if (!additional.toString().isEmpty()) {
-                                String s = "/NN";
-                                additional.append(s);
-                                selectedTableModel.setAdditional(additional.toString());
-                            } else {
-                                selectedTableModel.setAdditional("NN");
+                                else selectedTableModel.setAdditional("");
                             }
-                        } else {
-                            String[] arr = additional.toString().split("/");
-                            if (arr.length == 2)
-                                selectedTableModel.setAdditional(arr[0]);
-                            else selectedTableModel.setAdditional("");
-                        }
-                        selectedTableModel.updateData(model.getxTableView());
-                    });
+                            selectedTableModel.updateData(model.getxTableView());
+                        });
 
+                    }
                 }
             }
         }
