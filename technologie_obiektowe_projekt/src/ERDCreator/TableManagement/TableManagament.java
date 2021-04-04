@@ -23,6 +23,7 @@ public class TableManagament extends TableApperance {
     private double orgSceneX, orgSceneY;
     private double orgTranslateX, orgTranslateY;
     private Pane content;
+    private TextArea logTextAreaID;
 
 
 
@@ -30,10 +31,11 @@ public class TableManagament extends TableApperance {
     }
 
     public void setParameters(Pane content, ScrollPane workingPane, Set<MoveableNodeModel> nodes,
-                              Optional<Model> chosenModel) {
+                              Optional<Model> chosenModel,TextArea logTextAreaID) {
         this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
+        this.logTextAreaID = logTextAreaID;
         setChosenModel(chosenModel);
     }
 
@@ -50,6 +52,7 @@ public class TableManagament extends TableApperance {
         tableModel.assignPrimaryKey(xTableView);
         newLoadedPane.getChildren().add(xTableView);
         Label label = new Label(getFirstTextToLabel());
+        label.setId(label.toString().split("\\[")[0]);
         hBox.getChildren().add(label);
         hBox.setBackground(getColorToMovableNode());
         content.getChildren().addAll(newLoadedPane);
@@ -66,7 +69,7 @@ public class TableManagament extends TableApperance {
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
-                setLabelTextIfClicked(moveableNodeModel, workingPane);
+                if(!isLabelOfTableClicked) setLabelTextIfClicked(moveableNodeModel, workingPane,logTextAreaID);
 
             });
 

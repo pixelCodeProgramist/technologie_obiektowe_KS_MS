@@ -2,12 +2,11 @@ package ERDCreator.TableManagement;
 
 import ERDCreator.resources.XTableView;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -28,12 +27,14 @@ public class TableApperance {
     private Optional<Model> chosenModel;
     private int classNumber = 0;
     private int tabelNumber = 0;
-    protected void setChosenModel(Optional<Model> chosenModel){
+    protected boolean isLabelOfTableClicked = false;
+    protected void setChosenModel(Optional<Model> chosenModel) {
         this.chosenModel = chosenModel;
     }
-    private List<String> prohibitedTableNames = new ArrayList<>(Arrays.asList("CREATE","DISTINCT","INSERT","INTO","SELECT","TABLE","*","VALUES","NULL","IS","DROP","ALTER","CONSTRAINT"));
-    private List<String> availableTypeNamesWithBracket = new ArrayList<>(Arrays.asList("BIT","BOOLEAN","CHAR","DATETIME2","DECIMAL","DECFLOAT","DOUBLE","FLOAT","INTERVAL DAY TO SECOND","INTERVAL YEAR TO MONTH","MONEY","NCHAR","NUMERIC","NVARCHAR","RAW","SMALLMONEY","SYSNAME","TIMESTAMP WITH LOCAL TIME ZONE","TIMESTAMP WITH TIME ZONE","TIMESTAMP","UNIQUEIDENTIFIER","UROWID","VARCHAR","STRING"));
-    private List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO","BFile","BIGINT","BINARY","BINARY DOUBLE","BINARY FLOAT","BLOB","CLOB","DATALINK","DATE","DATETIME","GRAPHIC","HTTPURITYPE","IMAGE","INTEGER","LONG CHAR","LONG_RAW","NCLOB","NTEXT","ORDAUDIO","ORDDOC","ORDIMAGE","ORDIMAGE_SIGNATURE","ORDVIDEO","REAL","ROWID","SMALLDATETIME","SMALLINT","SQL_VARIANT","SYS_ANYDATA","SYS_ANYDATASET","SYS_ANYTYPE","TEXT","TINYINT","TIME","URITYPE","VARBINARY","VARGRAPHIC","VIDEO","XDBURITYPE","XMLTYPE","JSON"));
+
+    private List<String> prohibitedTableNames = new ArrayList<>(Arrays.asList("CREATE", "DISTINCT", "INSERT", "INTO", "SELECT", "TABLE", "*", "VALUES", "NULL", "IS", "DROP", "ALTER", "CONSTRAINT"));
+    private List<String> availableTypeNamesWithBracket = new ArrayList<>(Arrays.asList("BIT", "BOOLEAN", "CHAR", "DATETIME2", "DECIMAL", "DECFLOAT", "DOUBLE", "FLOAT", "INTERVAL DAY TO SECOND", "INTERVAL YEAR TO MONTH", "MONEY", "NCHAR", "NUMERIC", "NVARCHAR", "RAW", "SMALLMONEY", "SYSNAME", "TIMESTAMP WITH LOCAL TIME ZONE", "TIMESTAMP WITH TIME ZONE", "TIMESTAMP", "UNIQUEIDENTIFIER", "UROWID", "VARCHAR", "STRING"));
+    private List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO", "BFile", "BIGINT", "BINARY", "BINARY DOUBLE", "BINARY FLOAT", "BLOB", "CLOB", "DATALINK", "DATE", "DATETIME", "GRAPHIC", "HTTPURITYPE", "IMAGE", "INTEGER", "LONG CHAR", "LONG_RAW", "NCLOB", "NTEXT", "ORDAUDIO", "ORDDOC", "ORDIMAGE", "ORDIMAGE_SIGNATURE", "ORDVIDEO", "REAL", "ROWID", "SMALLDATETIME", "SMALLINT", "SQL_VARIANT", "SYS_ANYDATA", "SYS_ANYDATASET", "SYS_ANYTYPE", "TEXT", "TINYINT", "TIME", "URITYPE", "VARBINARY", "VARGRAPHIC", "VIDEO", "XDBURITYPE", "XMLTYPE", "JSON"));
 
     protected String getFirstTextToLabel() {
         if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
@@ -61,27 +62,43 @@ public class TableApperance {
     }
 
 
-    protected void setLabelTextIfClicked(MoveableNodeModel e, ScrollPane workingPane) {
+    protected void setLabelTextIfClicked(MoveableNodeModel e, ScrollPane workingPane, TextArea logTextAreaID) {
         e.getLabel().setOnMouseClicked(event -> {
+            this.isLabelOfTableClicked = true;
+            Label beforeModificationLabel = e.getLabel();
             TextField textField = new TextField();
             e.gethBox().getChildren().add(textField);
             Label label = new Label();
+            label.setId(e.getLabel().getId());
             e.gethBox().getChildren().remove(e.getLabel());
 
-            workingPane.setOnMouseClicked(ec -> {
+            workingPane.setOnKeyPressed(ec -> {
                 label.setText(textField.getText());
                 String helpString = label.getText().replaceAll("\\s", "");
                 if (!label.getText().trim().equals("")
                         && helpString.equals(label.getText())
                         && !prohibitedTableNames.contains(helpString.toUpperCase())
-                    ) {
+                ) {
                     if (!e.gethBox().getChildren().contains(label)) {
                         e.gethBox().getChildren().remove(textField);
                         label.setMinWidth(label.getText().length() * 6.5);
                         e.getxTableView().setMinWidth(label.getText().length() * 6.5);
                         e.gethBox().getChildren().add(label);
                         e.setLabel(label);
+                        this.isLabelOfTableClicked = false;
+                        String [] textAreaStringSplit = logTextAreaID.getText().split("\n");
+                        StringBuilder newTextArea = new StringBuilder();
+                        for(String text: textAreaStringSplit){
+                            if(!text.startsWith(e.getLabel().getId())&&!text.trim().equals("")) newTextArea.append(text+"\n");
+                        }
+                        logTextAreaID.setText(newTextArea.toString());
                     }
+                }else {
+                    if(ec.getCode().equals(KeyCode.ENTER))
+                         if(logTextAreaID.getText().equals(""))
+                             logTextAreaID.setText(label.getId()+": " + "Nie zmieniono "+beforeModificationLabel.getText()+" na "+label.getText()+"\n");
+                         else
+                             logTextAreaID.setText(logTextAreaID.getText()+label.getId()+": " + "Nie zmieniono "+beforeModificationLabel.getText()+" na "+label.getText()+"\n");
                 }
             });
         });
@@ -103,23 +120,23 @@ public class TableApperance {
                     tableModel.setId((String) cellEditEvent.getNewValue());
                 if (cellEditEvent.getTablePosition().getColumn() == 1) {
                     String typeString = (String) cellEditEvent.getNewValue();
-                    if(availableTypeNamesWithoutBracket.contains(typeString.toUpperCase())) {
+                    if (availableTypeNamesWithoutBracket.contains(typeString.toUpperCase())) {
                         tableModel.setType(typeString);
-                    }else {
-                        availableTypeNamesWithBracket.forEach(str->{
-                            if(typeString.toUpperCase().startsWith(str)) {
+                    } else {
+                        availableTypeNamesWithBracket.forEach(str -> {
+                            if (typeString.toUpperCase().startsWith(str)) {
                                 String[] arrStr = typeString.split("\\(");
                                 String[] arrStr2 = typeString.split("\\)");
-                                if(arrStr2.length==1&&arrStr.length==2&typeString.endsWith(")")){
-                                    arrStr[1] = arrStr[1].substring(0,arrStr[1].length()-1);
-                                    if(arrStr[1].matches("\\d+")&&!arrStr[1].startsWith("0")) tableModel.setType((String) cellEditEvent.getNewValue());
+                                if (arrStr2.length == 1 && arrStr.length == 2 & typeString.endsWith(")")) {
+                                    arrStr[1] = arrStr[1].substring(0, arrStr[1].length() - 1);
+                                    if (arrStr[1].matches("\\d+") && !arrStr[1].startsWith("0"))
+                                        tableModel.setType((String) cellEditEvent.getNewValue());
                                     else tableModel.setType((String) cellEditEvent.getOldValue());
-                                }else {
-                                    if(typeString.toUpperCase().equals(str)) tableModel.setType(typeString);
+                                } else {
+                                    if (typeString.toUpperCase().equals(str)) tableModel.setType(typeString);
                                     else tableModel.setType((String) cellEditEvent.getOldValue());
                                 }
-                            }
-                            else {
+                            } else {
                                 tableModel.setType((String) cellEditEvent.getOldValue());
                             }
                         });

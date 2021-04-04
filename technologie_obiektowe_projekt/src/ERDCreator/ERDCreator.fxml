@@ -25,6 +25,8 @@
                   <Button mnemonicParsing="false" onMouseClicked="#addComponentClick" prefHeight="34.0" prefWidth="161.0" text="Dodaj komponent" />
 
                </children></HBox>
+            <TextArea fx:id="logTextAreaID" editable="false" layoutX="25.0" layoutY="735.0" prefHeight="89.0" prefWidth="932.0" />
+            <Label layoutX="40.0" layoutY="714.0" text="Logi" />
          </children>
       </Pane>
    </children>

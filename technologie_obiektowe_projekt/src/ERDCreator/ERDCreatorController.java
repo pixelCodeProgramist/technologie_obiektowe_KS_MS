@@ -6,6 +6,7 @@ import ERDCreator.TableManagement.TableManagament;
 import SQLCreator.SQLCreatorController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -26,6 +27,8 @@ public class ERDCreatorController {
     private LeftPanelCreator leftPanelCreator;
     private Pane content;
     @FXML
+    private TextArea logTextAreaID;
+    @FXML
     private ScrollPane workingPane;
 
     public ERDCreatorController(Set<MoveableNodeModel> nodes) {
@@ -45,7 +48,7 @@ public class ERDCreatorController {
         workingPane.setContent(content);
         this.workingPane.setContent(content);
         this.workingPane.setPannable(true);
-        tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
+        tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel(),logTextAreaID);
         this.nodes.forEach(e->{
             content.getChildren().add(e.getAnchorPane());
         });
@@ -67,7 +70,7 @@ public class ERDCreatorController {
     @FXML
     public void addComponentClick(MouseEvent mouseEvent) throws IOException {
         if (leftPanelCreator.isActivatedToAddPane()) {
-            tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel());
+            tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel(),logTextAreaID);
             tableManagament.addComponentClick();
         }
     }
