@@ -40,6 +40,15 @@ public class TableManagament extends TableApperance {
     }
 
     public void addComponentClick() throws IOException {
+        if(nodes.size()==0){
+            String[] textAreaStringSplit = logTextAreaID.getText().split("\n");
+            StringBuilder newTextArea = new StringBuilder();
+            for (String text : textAreaStringSplit) {
+                if (!text.startsWith("Brak tabel w panelu roboczym"))
+                    newTextArea.append(text).append("\n");
+            }
+            logTextAreaID.setText(newTextArea.toString());
+        }
         newLoadedPane = FXMLLoader.load(getClass().getResource("../../ERDCreator/resources/MoveableNode.fxml"));
         HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
         Model model = new Model("images/keys/gold.png", "");

@@ -80,6 +80,8 @@ public class ERDCreatorController {
         if(nodes.size()>0) {
             Configuration configuration = new Configuration();
             configuration.changeScene("../SQLCreator/SQLCreator.fxml", mouseEvent, new SQLCreatorController(nodes));
+        }else{
+            logTextAreaID.setText(logTextAreaID.getText()+"Brak tabel w panelu roboczym\n");
         }
     }
 }
