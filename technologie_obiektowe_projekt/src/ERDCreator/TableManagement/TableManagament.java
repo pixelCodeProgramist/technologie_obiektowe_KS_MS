@@ -11,10 +11,9 @@ import models.TableModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 
 public class TableManagament extends TableApperance {
@@ -25,14 +24,14 @@ public class TableManagament extends TableApperance {
     private double orgTranslateX, orgTranslateY;
     private Pane content;
     private TextArea logTextAreaID;
-    private Map<String,Integer> fieldNameNumberMap;
+    private Map<TableColumn, Integer> fieldNameNumberMap = new HashMap<>();
 
 
     public TableManagament() {
     }
 
     public void setParameters(Pane content, ScrollPane workingPane, Set<MoveableNodeModel> nodes,
-                              Optional<Model> chosenModel,TextArea logTextAreaID) {
+                              Optional<Model> chosenModel, TextArea logTextAreaID) {
         this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
@@ -44,7 +43,7 @@ public class TableManagament extends TableApperance {
         newLoadedPane = FXMLLoader.load(getClass().getResource("../../ERDCreator/resources/MoveableNode.fxml"));
         HBox hBox = (HBox) newLoadedPane.getChildren().get(0);
         Model model = new Model("images/keys/gold.png", "");
-        TableModel tableModel = new TableModel("id", "NUMBER", model.getImageView(20, 20),"U/NN");
+        TableModel tableModel = new TableModel("id", "NUMBER", model.getImageView(20, 20), "U/NN");
         tableModel.setPrimaryKey(true);
         tableModel.setForeignKey(false);
         tableModel.setNotNull(true);
@@ -70,19 +69,17 @@ public class TableManagament extends TableApperance {
             moveableNodeModel.getAnchorPane().setOnMousePressed(ep -> {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
-                if(!isLabelOfTableClicked) setLabelTextIfClicked(nodes,moveableNodeModel, workingPane,logTextAreaID);
+                if (!isLabelOfTableClicked) setLabelTextIfClicked(nodes, moveableNodeModel, workingPane, logTextAreaID);
 
             });
 
             moveableNodeModel.getxTableView().setOnMouseClicked(ec -> {
-                setResize(moveableNodeModel);
+                setResize(moveableNodeModel,logTextAreaID);
             });
 
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
                 expandContextMenu(mp, moveableNodeModel);
             });
-
-
 
 
         });
@@ -99,11 +96,10 @@ public class TableManagament extends TableApperance {
             model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
             boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
 //            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
-            if(primaryKeyChecked){
+            if (primaryKeyChecked) {
                 model.getContextMenu().getItems().get(4).setVisible(false);
                 model.getContextMenu().getItems().get(5).setVisible(false);
-            }
-            else{
+            } else {
                 model.getContextMenu().getItems().get(4).setVisible(true);
                 model.getContextMenu().getItems().get(5).setVisible(true);
             }
@@ -117,14 +113,31 @@ public class TableManagament extends TableApperance {
 
                 if (i == 0) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
-                        TableModel tableModel = new TableModel("nazwa", "NUMBER", null,"");
-                        tableModel.assignPrimaryKey(model.getxTableView());
+                        AtomicInteger highestNumberName= new AtomicInteger(1);
+                        model.getxTableView().getItems().forEach(row->{
+                            String id = ((TableModel)row).getId();
+                            if(id.startsWith("nazwa")){
+                                String [] splittedId = id.split("nazwa");
+                                if(splittedId.length>1){
+                                    String number = splittedId[1];
+                                    Pattern pattern = Pattern.compile("-?\\d+");
+                                    if(pattern.matcher(number).matches()){
+                                       int numberInt = Integer.parseInt(number);
+                                       numberInt++;
+                                       if(numberInt> highestNumberName.get()) highestNumberName.set(numberInt);
+                                    }
+                                }
+                            }
+                        });
+                        TableModel tableModel = new TableModel("nazwa"+highestNumberName.get(), "NUMBER", null, "");
                         model.getAnchorPane().setMinHeight(model.getAnchorPane().getMinWidth() + 30);
                         model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
                         model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
                         model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
+                        tableModel.assignPrimaryKey(model.getxTableView());
                         selectedTableModel.updateData(model.getxTableView());
-                        if(model.getxTableView().getItems().size() > 1) model.getContextMenu().getItems().get(1).setVisible(true);
+                        if (model.getxTableView().getItems().size() > 1)
+                            model.getContextMenu().getItems().get(1).setVisible(true);
                     });
                 }
                 if (i == 1) {
@@ -152,19 +165,19 @@ public class TableManagament extends TableApperance {
                 if (i == 3) {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         selectedTableModel.setPrimaryKey(true);
-                        if(selectedTableModel.isPrimaryKey()) {
+                        if (selectedTableModel.isPrimaryKey()) {
                             try {
                                 Model model2 = new Model("images/keys/gold.png", "");
                                 selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
                                 selectedTableModel.setForeignKey(false);
                                 selectedTableModel.setNotNull(true);
                                 selectedTableModel.setUnique(true);
-                                selectedTableModel.updateDataKey(model.getxTableView(),true);
+                                selectedTableModel.updateDataKey(model.getxTableView(), true);
 
                             } catch (FileNotFoundException fileNotFoundException) {
                                 fileNotFoundException.printStackTrace();
                             }
-                        }else {
+                        } else {
                             selectedTableModel.setPrimaryForeignNoneKey(null);
                         }
                     });
@@ -193,23 +206,22 @@ public class TableManagament extends TableApperance {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         String additional = selectedTableModel.getAdditional();
                         selectedTableModel.setUnique(!selectedTableModel.isUnique());
-                        if(selectedTableModel.isUnique()){
-                            if(!additional.isEmpty()){
+                        if (selectedTableModel.isUnique()) {
+                            if (!additional.isEmpty()) {
                                 StringBuilder stringBuilder = new StringBuilder("U/");
                                 stringBuilder.append(additional);
                                 selectedTableModel.setAdditional(stringBuilder.toString());
                                 additional = stringBuilder.toString();
-                            }else {
+                            } else {
                                 selectedTableModel.setAdditional("U");
                             }
-                        }else {
-                            String [] arr = additional.split("/");
-                            if(arr.length==2) {
-                                if(selectedTableModel.isUnique())
+                        } else {
+                            String[] arr = additional.split("/");
+                            if (arr.length == 2) {
+                                if (selectedTableModel.isUnique())
                                     selectedTableModel.setAdditional(arr[0]);
                                 else selectedTableModel.setAdditional(arr[1]);
-                            }
-                            else selectedTableModel.setAdditional("");
+                            } else selectedTableModel.setAdditional("");
                         }
 
                         selectedTableModel.updateData(model.getxTableView());
@@ -221,17 +233,17 @@ public class TableManagament extends TableApperance {
                     model.getContextMenu().getItems().get(i).setOnAction(e -> {
                         StringBuilder additional = new StringBuilder(selectedTableModel.getAdditional());
                         selectedTableModel.setNotNull(!selectedTableModel.isNotNull());
-                        if(selectedTableModel.isNotNull()){
-                            if(!additional.toString().isEmpty()){
-                                String s ="/NN";
+                        if (selectedTableModel.isNotNull()) {
+                            if (!additional.toString().isEmpty()) {
+                                String s = "/NN";
                                 additional.append(s);
                                 selectedTableModel.setAdditional(additional.toString());
-                            }else {
+                            } else {
                                 selectedTableModel.setAdditional("NN");
                             }
-                        }else {
-                            String [] arr = additional.toString().split("/");
-                            if(arr.length==2)
+                        } else {
+                            String[] arr = additional.toString().split("/");
+                            if (arr.length == 2)
                                 selectedTableModel.setAdditional(arr[0]);
                             else selectedTableModel.setAdditional("");
                         }
@@ -272,26 +284,31 @@ public class TableManagament extends TableApperance {
             double offsetY = ed.getSceneY() - orgSceneY - e.getAnchorPane().getLayoutY();
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
-            if (newTranslateX > 0+e.getAnchorPane().getLayoutX()) {
-                newTranslateX = -5+e.getAnchorPane().getLayoutX();
+
+
+            if (newTranslateX > 0 + e.getAnchorPane().getLayoutX()) {
+                newTranslateX = -5 + e.getAnchorPane().getLayoutX();
+
                 setOtherNodesInPane(e, 3, true);
 
             }
-            if (newTranslateY > 0+e.getAnchorPane().getLayoutY()) {
-                newTranslateY = -5+e.getAnchorPane().getLayoutY();
+            if (newTranslateY > 0 + e.getAnchorPane().getLayoutY()) {
+                newTranslateY = -5 + e.getAnchorPane().getLayoutY();
+
                 setOtherNodesInPane(e, 3, false);
 
             }
-            if (newTranslateY < -537+e.getAnchorPane().getLayoutY()) {
-                newTranslateY = -532+e.getAnchorPane().getLayoutY();
+            if (newTranslateY < -537 + e.getAnchorPane().getLayoutY()) {
+                newTranslateY = -532 + e.getAnchorPane().getLayoutY();
+
                 setOtherNodesInPane(e, -3, false);
             }
 
-            if (newTranslateX < -578+e.getAnchorPane().getLayoutX()) {
-                newTranslateX = -578+e.getAnchorPane().getLayoutX();
+            if (newTranslateX < -578 + e.getAnchorPane().getLayoutX()) {
+                newTranslateX = -578 + e.getAnchorPane().getLayoutX();
+
                 setOtherNodesInPane(e, -3, true);
-                workingPane.setVvalue(workingPane.getVmax());
-                workingPane.setHvalue(workingPane.getHmax());
+
             }
 
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);

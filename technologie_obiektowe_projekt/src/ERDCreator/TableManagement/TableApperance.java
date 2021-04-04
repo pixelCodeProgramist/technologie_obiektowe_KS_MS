@@ -14,6 +14,7 @@ import models.MoveableNodeModel;
 import models.TableModel;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -113,7 +114,7 @@ public class TableApperance {
     }
 
 
-    protected void setResize(MoveableNodeModel m) {
+    protected void setResize(MoveableNodeModel m,TextArea logTextAreaID) {
         XTableView xTableView = m.getxTableView();
         AtomicReference<Double> max = new AtomicReference<>((double) 10);
         xTableView.getColumns().stream().forEach(column -> {
@@ -121,6 +122,7 @@ public class TableApperance {
             tableColumn.setOnEditCommit(comm -> {
 
                 double tableWidth = 0;
+
                 TableColumn.CellEditEvent cellEditEvent = (TableColumn.CellEditEvent) comm;
                 TableModel tableModel = (TableModel)
                         cellEditEvent.getTableView().getItems().get(cellEditEvent.getTablePosition().getRow());
@@ -137,18 +139,40 @@ public class TableApperance {
                                 String[] arrStr2 = typeString.split("\\)");
                                 if (arrStr2.length == 1 && arrStr.length == 2 & typeString.endsWith(")")) {
                                     arrStr[1] = arrStr[1].substring(0, arrStr[1].length() - 1);
-                                    if (arrStr[1].matches("\\d+") && !arrStr[1].startsWith("0"))
+                                    if (arrStr[1].matches("\\d+") && !arrStr[1].startsWith("0")) {
                                         tableModel.setType((String) cellEditEvent.getNewValue());
-                                    else tableModel.setType((String) cellEditEvent.getOldValue());
+                                    }
+                                    else{
+                                        tableModel.setType((String) cellEditEvent.getOldValue());
+                                    }
                                 } else {
-                                    if (typeString.toUpperCase().equals(str)) tableModel.setType(typeString);
-                                    else tableModel.setType((String) cellEditEvent.getOldValue());
+                                    if (typeString.toUpperCase().equals(str)) {
+                                        tableModel.setType(typeString);
+                                    }
+                                    else{
+                                        tableModel.setType((String) cellEditEvent.getOldValue());
+                                    }
                                 }
                             } else {
                                 tableModel.setType((String) cellEditEvent.getOldValue());
                             }
                         });
                     }
+
+                    if(!cellEditEvent.getOldValue().equals(typeString)){
+                         logTextAreaID.setText(logTextAreaID.getText()+m.getxTableView().toString().split("\\[")[0]
+                                 +": nie udało się w tabeli " + m.getLabel().getText() + " zmienić typu "+ cellEditEvent.getOldValue()+" na typ "+typeString+"\n");
+                    }else {
+                        String [] splittedLogText = logTextAreaID.getText().split("\n");
+                        StringBuilder newTextArea = new StringBuilder();
+                        for (String text : splittedLogText) {
+                            if (!text.startsWith(m.getxTableView().toString().split(("\\["))[0]) && !text.trim().equals(""))
+                                newTextArea.append(text + "\n");
+                        }
+                        logTextAreaID.setText(newTextArea.toString());
+                    }
+
+
                     tableModel.updateData(xTableView);
                 }
 
@@ -178,6 +202,7 @@ public class TableApperance {
                     xTableView.setMinWidth(m.gethBox().getMinWidth());
                     xTableView.setMaxWidth(m.gethBox().getMaxWidth());
                 }
+
 
             });
 
