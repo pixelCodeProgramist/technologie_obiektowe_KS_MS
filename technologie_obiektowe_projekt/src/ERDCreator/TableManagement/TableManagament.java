@@ -3,25 +3,21 @@ package ERDCreator.TableManagement;
 import ERDCreator.Line.LineConnection;
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.Key;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class TableManagament extends TableApperance {
@@ -33,7 +29,6 @@ public class TableManagament extends TableApperance {
     private Pane content;
     private TextArea logTextAreaID;
     private List<LineConnection> lineConnections;
-    private int counter = 0;
     private boolean canConnectTablesMainState;
     private boolean canFirstConnectTable;
     private boolean canSecondConnectTable;
@@ -52,17 +47,17 @@ public class TableManagament extends TableApperance {
         setChosenModel(chosenModel);
     }
 
-    public Point2D calculateTheShortestPoint(MoveableNodeModel moveableNodeModel,LineConnection lineConnection){
-        Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(),lineConnection.getEndY());
-        Point2D top = new Point2D(lineConnection.getEndX(),moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
-        Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(),lineConnection.getEndY());
-        Point2D bottom = new Point2D(lineConnection.getEndX(),moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
-        Point2D startPosition = new Point2D(lineConnection.getStartX(),lineConnection.getStartY());
+    public Point2D calculateTheShortestPoint(MoveableNodeModel moveableNodeModel, LineConnection lineConnection) {
+        Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(), lineConnection.getEndY());
+        Point2D top = new Point2D(lineConnection.getEndX(), moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
+        Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(), lineConnection.getEndY());
+        Point2D bottom = new Point2D(lineConnection.getEndX(), moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
+        Point2D startPosition = new Point2D(lineConnection.getStartX(), lineConnection.getStartY());
         Map<Point2D, Double> distances = new HashMap<>();
-        distances.put(left,startPosition.distance(left));
-        distances.put(top,startPosition.distance(top));
-        distances.put(right,startPosition.distance(right));
-        distances.put(bottom,startPosition.distance(bottom));
+        distances.put(left, startPosition.distance(left));
+        distances.put(top, startPosition.distance(top));
+        distances.put(right, startPosition.distance(right));
+        distances.put(bottom, startPosition.distance(bottom));
         return distances.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
     }
 
@@ -77,20 +72,21 @@ public class TableManagament extends TableApperance {
             lineConnection.setStartY((moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY()
                     + moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
             lineConnections.add(lineConnection);
+            moveableNodeModel.addLineConnection(lineConnection, "output");
             canFirstConnectTable = false;
             canSecondConnectTable = true;
             lineConnection.setEndX(lineConnection.getEndX());
             lineConnection.setEndY(lineConnection.getEndY());
-
             content.getChildren().addAll(lineConnection.getLine());
             lineConnection.getLine().toBack();
-        } else{
+        } else {
             lineConnection = lineConnections.get(lineConnections.size() - 1);
             canFirstConnectTable = false;
             canSecondConnectTable = false;
-            Point2D endPoint = calculateTheShortestPoint(moveableNodeModel,lineConnection);
+            Point2D endPoint = calculateTheShortestPoint(moveableNodeModel, lineConnection);
             lineConnection.setEndX(endPoint.getX());
             lineConnection.setEndY(endPoint.getY());
+            moveableNodeModel.addLineConnection(lineConnection, "input");
         }
 
 
@@ -148,18 +144,19 @@ public class TableManagament extends TableApperance {
                     expandContextMenu(mp, moveableNodeModel);
             });
             if (canConnectTablesMainState) {
+
                 moveableNodeModel.getAnchorPane().setOnMouseClicked(mc -> {
-                    connectTables(moveableNodeModel);
+                    if (mc.getButton() == MouseButton.PRIMARY)
+                        connectTables(moveableNodeModel);
+
                 });
                 moveableNodeModel.getxTableView().setOnMouseClicked(mc -> {
-                    connectTables(moveableNodeModel);
+                    if (mc.getButton() == MouseButton.PRIMARY)
+                        connectTables(moveableNodeModel);
                 });
-                if(!canFirstConnectTable&&canSecondConnectTable){
-
-                    this.lineConnections.get(this.lineConnections.size()-1).setEndX(event.getX());
-                    this.lineConnections.get(this.lineConnections.size()-1).setEndY(event.getY());
-
-
+                if (!canFirstConnectTable && canSecondConnectTable) {
+                    this.lineConnections.get(this.lineConnections.size() - 1).setEndX(event.getX());
+                    this.lineConnections.get(this.lineConnections.size() - 1).setEndY(event.getY());
                 }
             }
 
@@ -353,7 +350,7 @@ public class TableManagament extends TableApperance {
 
     private void setOtherNodesInPane(MoveableNodeModel e, int val, boolean isX) {
         ((Pane) workingPane.getContent()).getChildren().forEach(p -> {
-            if (!p.equals(e.getAnchorPane())) {
+            if (!p.equals(e.getAnchorPane()) && !p.getClass().toString().contains("Line")) {
                 if (isX)
                     p.setLayoutX(p.getLayoutX() + val);
                 else
@@ -362,41 +359,89 @@ public class TableManagament extends TableApperance {
         });
     }
 
+    public MoveableNodeModel findAfterConnection(LineConnection lineConnection) {
+
+        Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> e.getLineConnectionStringMap().get(lineConnection).equals("input")).findFirst();
+        if(moveableNodeModel.isPresent()){
+            lineConnection.setEndX((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinX()
+                    +moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxX())/2);
+            lineConnection.setEndY((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinY()
+                    +moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxY())/2);
+        }
+
+        return null;
+    }
+
+
     private void setNodePositionIfDragged(MoveableNodeModel e) {
         e.getAnchorPane().setOnMouseDragged(ed -> {
             double offsetX = ed.getSceneX() - orgSceneX - e.getAnchorPane().getLayoutX();
             double offsetY = ed.getSceneY() - orgSceneY - e.getAnchorPane().getLayoutY();
             double newTranslateX = orgTranslateX - offsetX;
             double newTranslateY = orgTranslateY - offsetY;
-
+            Map<LineConnection, String> lineConnectionStringMap = e.getLineConnectionStringMap();
+            Set<LineConnection> inputLines = lineConnectionStringMap.entrySet()
+                    .stream()
+                    .filter(entry -> Objects.equals(entry.getValue(), "input"))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+            Set<LineConnection> outputLines = lineConnectionStringMap.entrySet()
+                    .stream()
+                    .filter(entry -> Objects.equals(entry.getValue(), "output"))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
 
             if (newTranslateX > 0 + e.getAnchorPane().getLayoutX()) {
-                newTranslateX = -5 + e.getAnchorPane().getLayoutX();
-
+                newTranslateX = -5 + e.getAnchorPane().getBoundsInParent().getMinX();
                 setOtherNodesInPane(e, 3, true);
+                inputLines.forEach(input -> {
+                    input.setStartX(input.getStartX() + 3);
+                });
+                outputLines.forEach(output -> {
+                    findAfterConnection(output);
+                });
 
             }
             if (newTranslateY > 0 + e.getAnchorPane().getLayoutY()) {
-                newTranslateY = -5 + e.getAnchorPane().getLayoutY();
-
+                newTranslateY = -5 + e.getAnchorPane().getBoundsInParent().getMinY();
                 setOtherNodesInPane(e, 3, false);
+                inputLines.forEach(input -> {
+                    input.setStartY(input.getStartY() + 3);
+                });
 
             }
             if (newTranslateY < -537 + e.getAnchorPane().getLayoutY()) {
                 newTranslateY = -532 + e.getAnchorPane().getLayoutY();
-
                 setOtherNodesInPane(e, -3, false);
+                inputLines.forEach(input -> {
+                    input.setStartY(input.getStartY() - 3);
+                });
             }
 
             if (newTranslateX < -578 + e.getAnchorPane().getLayoutX()) {
                 newTranslateX = -578 + e.getAnchorPane().getLayoutX();
-
                 setOtherNodesInPane(e, -3, true);
-
+                inputLines.forEach(input -> {
+                    input.setStartX(input.getStartX() - 3);
+                });
             }
 
             ((AnchorPane) (ed.getSource())).setTranslateX(-newTranslateX);
             ((AnchorPane) (ed.getSource())).setTranslateY(-newTranslateY);
+            double finalNewTranslateX = newTranslateX;
+            double finalNewTranslateY = newTranslateY;
+            inputLines.forEach(input -> {
+                input.setEndX(-finalNewTranslateX);
+                input.setEndY(-finalNewTranslateY);
+                Point2D point2D = calculateTheShortestPoint(e, input);
+                input.setEndX(point2D.getX());
+                input.setEndY(point2D.getY());
+            });
+            outputLines.forEach(output -> {
+                output.setStartX((e.getAnchorPane().getBoundsInParent().getMinX() + e.getAnchorPane().getBoundsInParent().getMaxX()) / 2);
+                output.setStartY((e.getAnchorPane().getBoundsInParent().getMinY() + e.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
+            });
+
         });
     }
 
