@@ -69,9 +69,14 @@ public class ERDCreatorController {
 
     @FXML
     public void addComponentClick(MouseEvent mouseEvent) throws IOException {
-        if (leftPanelCreator.isActivatedToAddPane()) {
-            tableManagament.setParameters(content,workingPane,nodes,leftPanelCreator.getChosenModel(),logTextAreaID);
-            tableManagament.addComponentClick();
+        if (leftPanelCreator.isActivatedToAddPane()&&leftPanelCreator.getChosenModel().isPresent()) {
+            tableManagament.setParameters(content, workingPane, nodes, leftPanelCreator.getChosenModel(), logTextAreaID);
+            if(leftPanelCreator.getChosenModel().get().getDescription().equals("tabela")
+                    ||leftPanelCreator.getChosenModel().get().getDescription().equals("klasa")) {
+                tableManagament.addTableClick();
+            }else {
+                tableManagament.setStateToConnectTables(leftPanelCreator.getChosenModel().get().getDescription());
+            }
         }
     }
 

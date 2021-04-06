@@ -1,16 +1,24 @@
 package ERDCreator.TableManagement;
 
+import ERDCreator.Line.LineConnection;
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.Key;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
@@ -24,10 +32,15 @@ public class TableManagament extends TableApperance {
     private double orgTranslateX, orgTranslateY;
     private Pane content;
     private TextArea logTextAreaID;
-    private Map<TableColumn, Integer> fieldNameNumberMap = new HashMap<>();
-
+    private List<LineConnection> lineConnections;
+    private int counter = 0;
+    private boolean canConnectTablesMainState;
+    private boolean canFirstConnectTable;
+    private boolean canSecondConnectTable;
+    private String connectionType;
 
     public TableManagament() {
+        lineConnections = new ArrayList<>();
     }
 
     public void setParameters(Pane content, ScrollPane workingPane, Set<MoveableNodeModel> nodes,
@@ -39,8 +52,53 @@ public class TableManagament extends TableApperance {
         setChosenModel(chosenModel);
     }
 
-    public void addComponentClick() throws IOException {
-        if(nodes.size()==0){
+    public Point2D calculateTheShortestPoint(MoveableNodeModel moveableNodeModel,LineConnection lineConnection){
+        Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(),lineConnection.getEndY());
+        Point2D top = new Point2D(lineConnection.getEndX(),moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
+        Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(),lineConnection.getEndY());
+        Point2D bottom = new Point2D(lineConnection.getEndX(),moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
+        Point2D startPosition = new Point2D(lineConnection.getStartX(),lineConnection.getStartY());
+        Map<Point2D, Double> distances = new HashMap<>();
+        distances.put(left,startPosition.distance(left));
+        distances.put(top,startPosition.distance(top));
+        distances.put(right,startPosition.distance(right));
+        distances.put(bottom,startPosition.distance(bottom));
+        return distances.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
+    }
+
+    public void connectTables(MoveableNodeModel moveableNodeModel) {
+        LineConnection lineConnection;
+        if (canFirstConnectTable) {
+            lineConnection = new LineConnection();
+            lineConnection.setConnectionType(this.connectionType);
+            lineConnection.setTableFirst(moveableNodeModel.getAnchorPane());
+            lineConnection.setStartX((moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX()
+                    + moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX()) / 2);
+            lineConnection.setStartY((moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY()
+                    + moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
+            lineConnections.add(lineConnection);
+            canFirstConnectTable = false;
+            canSecondConnectTable = true;
+            lineConnection.setEndX(lineConnection.getEndX());
+            lineConnection.setEndY(lineConnection.getEndY());
+
+            content.getChildren().addAll(lineConnection.getLine());
+            lineConnection.getLine().toBack();
+        } else{
+            lineConnection = lineConnections.get(lineConnections.size() - 1);
+            canFirstConnectTable = false;
+            canSecondConnectTable = false;
+            Point2D endPoint = calculateTheShortestPoint(moveableNodeModel,lineConnection);
+            lineConnection.setEndX(endPoint.getX());
+            lineConnection.setEndY(endPoint.getY());
+        }
+
+
+    }
+
+    public void addTableClick() throws IOException {
+
+        if (nodes.size() == 0) {
             String[] textAreaStringSplit = logTextAreaID.getText().split("\n");
             StringBuilder newTextArea = new StringBuilder();
             for (String text : textAreaStringSplit) {
@@ -79,17 +137,31 @@ public class TableManagament extends TableApperance {
                 setNodePositionIfPressed(event, ep);
                 setNodePositionIfDragged(moveableNodeModel);
                 if (!isLabelOfTableClicked) setLabelTextIfClicked(nodes, moveableNodeModel, workingPane, logTextAreaID);
-
             });
 
             moveableNodeModel.getxTableView().setOnMouseClicked(ec -> {
-                setResize(moveableNodeModel,logTextAreaID);
+                setResize(moveableNodeModel, logTextAreaID);
             });
 
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
-                if(moveableNodeModel!=null)
+                if (moveableNodeModel != null)
                     expandContextMenu(mp, moveableNodeModel);
             });
+            if (canConnectTablesMainState) {
+                moveableNodeModel.getAnchorPane().setOnMouseClicked(mc -> {
+                    connectTables(moveableNodeModel);
+                });
+                moveableNodeModel.getxTableView().setOnMouseClicked(mc -> {
+                    connectTables(moveableNodeModel);
+                });
+                if(!canFirstConnectTable&&canSecondConnectTable){
+
+                    this.lineConnections.get(this.lineConnections.size()-1).setEndX(event.getX());
+                    this.lineConnections.get(this.lineConnections.size()-1).setEndY(event.getY());
+
+
+                }
+            }
 
 
         });
@@ -345,4 +417,10 @@ public class TableManagament extends TableApperance {
     }
 
 
+    public void setStateToConnectTables(String connectionType) {
+        this.connectionType = connectionType;
+        this.canConnectTablesMainState = true;
+        this.canFirstConnectTable = true;
+        this.canSecondConnectTable = false;
+    }
 }
