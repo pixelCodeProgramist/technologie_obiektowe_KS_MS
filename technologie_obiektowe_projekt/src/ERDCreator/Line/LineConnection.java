@@ -1,6 +1,7 @@
 package ERDCreator.Line;
 
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 
 public class LineConnection {
@@ -8,37 +9,51 @@ public class LineConnection {
     private AnchorPane tableFirst;
     private AnchorPane tableSecond;
     private Line line;
+    private Circle circle;
 
     public LineConnection() {
-       this.line = new Line();
-       
+        this.line = new Line();
+        this.circle = new Circle();
+        this.circle.setRadius(3);
     }
 
-    public void setStartX(double x){
+    public Circle getCircle() {
+        return circle;
+    }
+
+    public void setStartX(double x) {
         line.setStartX(x);
     }
-    public void setStartY(double y){
+
+    public void setStartY(double y) {
         line.setStartY(y);
     }
 
-    public void setEndX(double x){
+    public void setEndX(double x) {
         line.setEndX(x);
-    }
-    public void setEndY(double y){
-        line.setEndY(y);
+        if (connectionType.equals("1 do *"))
+            this.circle.setLayoutX(x);
     }
 
-    public double getStartX(){
+    public void setEndY(double y) {
+        line.setEndY(y);
+        if (connectionType.equals("1 do *"))
+            this.circle.setLayoutY(y);
+    }
+
+    public double getStartX() {
         return line.getStartX();
     }
-    public double getStartY(){
+
+    public double getStartY() {
         return line.getStartY();
     }
 
-    public double getEndX(){
+    public double getEndX() {
         return line.getEndX();
     }
-    public double getEndY(){
+
+    public double getEndY() {
         return line.getEndY();
     }
 
