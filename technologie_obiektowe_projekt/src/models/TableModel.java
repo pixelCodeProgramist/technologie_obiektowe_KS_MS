@@ -129,7 +129,7 @@ public class TableModel {
 
 
 
-    public void assignPrimaryKey(XTableView xTableView){
+    public void assignKey(XTableView xTableView){
         List list = new ArrayList(xTableView.getItems());
         list.add(this);
         ObservableList data = FXCollections.observableList(list);

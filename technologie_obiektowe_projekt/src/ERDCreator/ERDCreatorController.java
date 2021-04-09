@@ -5,6 +5,7 @@ import ERDCreator.LeftPanel.LeftPanelCreator;
 import ERDCreator.TableManagement.TableManagament;
 import SQLCreator.SQLCreatorController;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeView;
@@ -30,7 +31,8 @@ public class ERDCreatorController {
     private TextArea logTextAreaID;
     @FXML
     private ScrollPane workingPane;
-
+    @FXML
+    private Button addComponentButton;
     public ERDCreatorController(Set<MoveableNodeModel> nodes) {
         this.nodes = nodes;
     }
@@ -53,6 +55,7 @@ public class ERDCreatorController {
             content.getChildren().add(e.getAnchorPane());
         });
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
+        workingPane.setOnMouseClicked(tableManagament::workingPaneClickHandler);
     }
 
 
@@ -75,7 +78,8 @@ public class ERDCreatorController {
                     ||leftPanelCreator.getChosenModel().get().getDescription().equals("klasa")) {
                 tableManagament.addTableClick();
             }else {
-                tableManagament.setStateToConnectTables(leftPanelCreator.getChosenModel().get().getDescription());
+                tableManagament.setStateToConnectTables(leftPanelCreator.getChosenModel().get().getDescription(),addComponentButton);
+                addComponentButton.setDisable(true);
             }
         }
     }

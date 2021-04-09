@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
@@ -34,6 +35,8 @@ public class TableManagament extends TableApperance {
     private boolean canSecondConnectTable;
     private String connectionType;
 
+    private Button addComponentButton;
+
     public TableManagament() {
         lineConnections = new ArrayList<>();
     }
@@ -50,18 +53,19 @@ public class TableManagament extends TableApperance {
     public Point2D calculateTheShortestPoint(MoveableNodeModel moveableNodeModel, LineConnection lineConnection) {
         Point2D startPosition = new Point2D(lineConnection.getStartX(), lineConnection.getStartY());
         Map<Point2D, Double> distances = new HashMap<>();
-        for(int i=0;i<4;i++){
+        int size = 10;
+        for (int i = 0; i < size; i++) {
             Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(),
-                    lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*i)/4);
+                    lineConnection.getEndY() + (moveableNodeModel.getAnchorPane().getHeight() * i) / size);
             distances.put(left, startPosition.distance(left));
-            Point2D top = new Point2D(lineConnection.getEndX()+(moveableNodeModel.getAnchorPane().getWidth()*i)/4,
+            Point2D top = new Point2D(lineConnection.getEndX() + (moveableNodeModel.getAnchorPane().getWidth() * i) / size,
                     moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
             distances.put(top, startPosition.distance(top));
             Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(),
-                    lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*i)/4);
+                    lineConnection.getEndY() + (moveableNodeModel.getAnchorPane().getHeight() * i) / size);
             distances.put(right, startPosition.distance(right));
-            Point2D bottom = new Point2D(lineConnection.getEndX()+
-                    (moveableNodeModel.getAnchorPane().getWidth()*i)/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
+            Point2D bottom = new Point2D(lineConnection.getEndX() +
+                    (moveableNodeModel.getAnchorPane().getWidth() * i) / size, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
             distances.put(bottom, startPosition.distance(bottom));
         }
 
@@ -84,7 +88,8 @@ public class TableManagament extends TableApperance {
             canSecondConnectTable = true;
             lineConnection.setEndX(lineConnection.getEndX());
             lineConnection.setEndY(lineConnection.getEndY());
-            if (connectionType.equals("1 do *")||connectionType.equals("* do *")) content.getChildren().addAll(lineConnection.getLine(),lineConnection.getCircle());
+            if (connectionType.equals("1 do *") || connectionType.equals("* do *"))
+                content.getChildren().addAll(lineConnection.getLine(), lineConnection.getCircle());
             if (connectionType.equals("1 do 1")) content.getChildren().addAll(lineConnection.getLine());
             lineConnection.getLine().toBack();
             lineConnection.getCircle().toBack();
@@ -92,10 +97,13 @@ public class TableManagament extends TableApperance {
             lineConnection = lineConnections.get(lineConnections.size() - 1);
             canFirstConnectTable = false;
             canSecondConnectTable = false;
+            canConnectTablesMainState = false;
+            addComponentButton.setDisable(false);
             Point2D endPoint = calculateTheShortestPoint(moveableNodeModel, lineConnection);
             lineConnection.setEndX(endPoint.getX());
             lineConnection.setEndY(endPoint.getY());
             moveableNodeModel.addLineConnection(lineConnection, "input");
+            addForeignKey(findAfterConnection(lineConnection, true),moveableNodeModel,lineConnection.getConnectionType());
         }
 
 
@@ -121,7 +129,7 @@ public class TableManagament extends TableApperance {
         tableModel.setNotNull(true);
         tableModel.setUnique(true);
         XTableView xTableView = XTableView.generateXTableView(tableModel);
-        tableModel.assignPrimaryKey(xTableView);
+        tableModel.assignKey(xTableView);
         newLoadedPane.getChildren().add(xTableView);
         Label label = new Label(getFirstTextToLabel());
         label.setId(label.toString().split("\\[")[0]);
@@ -157,7 +165,6 @@ public class TableManagament extends TableApperance {
                 moveableNodeModel.getAnchorPane().setOnMouseClicked(mc -> {
                     if (mc.getButton() == MouseButton.PRIMARY)
                         connectTables(moveableNodeModel);
-
                 });
                 moveableNodeModel.getxTableView().setOnMouseClicked(mc -> {
                     if (mc.getButton() == MouseButton.PRIMARY)
@@ -173,13 +180,32 @@ public class TableManagament extends TableApperance {
         });
     }
 
+    public void addForeignKey(MoveableNodeModel modelFrom,MoveableNodeModel modelTo,String typeKey) {
+        try {
+            Model model2 = new Model("images/keys/gray.png", "");
+            if(typeKey.equals("1 do *")) {
+                TableModel tableModel = new TableModel(modelFrom.getLabel().getText()+modelTo.getLabel().getText()+"fk",
+                        "NUMBER", model2.getImageView(20, 20), "U/NN");
+
+                modelTo.getAnchorPane().setMinHeight(modelTo.getAnchorPane().getMinWidth() + 30);
+                modelTo.getAnchorPane().setMaxHeight(modelTo.getAnchorPane().getMaxHeight() + 30);
+                modelTo.getxTableView().setMinHeight(modelTo.getxTableView().getMinWidth() + 70);
+                modelTo.getxTableView().setMaxHeight(modelTo.getxTableView().getMaxHeight() + 70);
+                tableModel.assignKey(modelTo.getxTableView());
+            }
+        } catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        }
+
+
+    }
+
 
     private void expandContextMenu(MouseEvent mp, MoveableNodeModel model) {
         if (mp.isSecondaryButtonDown()) {
             TableModel selectedTableModel = (TableModel) model.getxTableView().getSelectionModel().getSelectedItem();
             if (selectedTableModel != null) {
                 ((CheckMenuItem) model.getContextMenu().getItems().get(3)).setSelected(selectedTableModel.isPrimaryKey());
-                //((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isForeignKey());
                 ((CheckMenuItem) model.getContextMenu().getItems().get(4)).setSelected(selectedTableModel.isUnique());
                 ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
                 model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
@@ -223,7 +249,7 @@ public class TableManagament extends TableApperance {
                             model.getAnchorPane().setMaxHeight(model.getAnchorPane().getMaxHeight() + 30);
                             model.getxTableView().setMinHeight(model.getxTableView().getMinWidth() + 70);
                             model.getxTableView().setMaxHeight(model.getxTableView().getMaxHeight() + 70);
-                            tableModel.assignPrimaryKey(model.getxTableView());
+                            tableModel.assignKey(model.getxTableView());
                             selectedTableModel.updateData(model.getxTableView());
                             if (model.getxTableView().getItems().size() > 1)
                                 model.getContextMenu().getItems().get(1).setVisible(true);
@@ -357,25 +383,34 @@ public class TableManagament extends TableApperance {
         orgTranslateY = -event.getY();
     }
 
-    private void setOtherNodesInPane(MoveableNodeModel e, int val, boolean isX) {
+    private void setOtherNodesInPane(MoveableNodeModel e, int val, boolean isX, Set<LineConnection> inputs) {
         ((Pane) workingPane.getContent()).getChildren().forEach(p -> {
-            if (!p.equals(e.getAnchorPane()) && !p.getClass().toString().contains("Line")) {
+            Set<Line> lines = new HashSet<>();
+            inputs.forEach(in -> lines.add(in.getLine()));
+            if (!p.equals(e.getAnchorPane()) && !lines.contains(p)) {
                 if (isX)
                     p.setLayoutX(p.getLayoutX() + val);
                 else
                     p.setLayoutY(p.getLayoutY() + val);
             }
+
+
         });
     }
 
-    public MoveableNodeModel findAfterConnection(LineConnection lineConnection) {
-
-        Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> e.getLineConnectionStringMap().get(lineConnection).equals("input")).findFirst();
-        if(moveableNodeModel.isPresent()){
-            lineConnection.setEndX((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinX()
-                    +moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxX())/2);
-            lineConnection.setEndY((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinY()
-                    +moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxY())/2);
+    public MoveableNodeModel findAfterConnection(LineConnection lineConnection,boolean isSecond) {
+        Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> {
+            if(!isSecond) return e.getLineConnectionStringMap().get(lineConnection).equals("input");
+            return e.getLineConnectionStringMap().get(lineConnection).equals("output");
+        }).findAny();
+        if (moveableNodeModel.isPresent()) {
+            if(!isSecond) {
+                lineConnection.setEndX((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinX()
+                        + moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxX()) / 2);
+                lineConnection.setEndY((moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMinY()
+                        + moveableNodeModel.get().getAnchorPane().getBoundsInParent().getMaxY()) / 2);
+            }
+            return moveableNodeModel.get();
         }
 
         return null;
@@ -402,45 +437,48 @@ public class TableManagament extends TableApperance {
 
             if (newTranslateX > 0 + e.getAnchorPane().getLayoutX()) {
                 newTranslateX = -5 + e.getAnchorPane().getBoundsInParent().getMinX();
-                setOtherNodesInPane(e, 3, true);
+                setOtherNodesInPane(e, 3, true, inputLines);
+
                 inputLines.forEach(input -> {
                     input.setStartX(input.getStartX() + 3);
                 });
+
                 outputLines.forEach(output -> {
-                    findAfterConnection(output);
+                    findAfterConnection(output, false);
                 });
 
             }
             if (newTranslateY > 0 + e.getAnchorPane().getLayoutY()) {
                 newTranslateY = -5 + e.getAnchorPane().getBoundsInParent().getMinY();
-                setOtherNodesInPane(e, 3, false);
+                setOtherNodesInPane(e, 3, false, inputLines);
+
                 inputLines.forEach(input -> {
                     input.setStartY(input.getStartY() + 3);
                 });
                 outputLines.forEach(output -> {
-                    findAfterConnection(output);
+                    findAfterConnection(output, false);
                 });
 
             }
             if (newTranslateY < -537 + e.getAnchorPane().getLayoutY()) {
                 newTranslateY = -532 + e.getAnchorPane().getLayoutY();
-                setOtherNodesInPane(e, -3, false);
+                setOtherNodesInPane(e, -3, false, inputLines);
                 inputLines.forEach(input -> {
                     input.setStartY(input.getStartY() - 3);
                 });
                 outputLines.forEach(output -> {
-                    findAfterConnection(output);
+                    findAfterConnection(output, false);
                 });
             }
 
             if (newTranslateX < -578 + e.getAnchorPane().getLayoutX()) {
                 newTranslateX = -578 + e.getAnchorPane().getLayoutX();
-                setOtherNodesInPane(e, -3, true);
+                setOtherNodesInPane(e, -3, true, inputLines);
                 inputLines.forEach(input -> {
                     input.setStartX(input.getStartX() - 3);
                 });
                 outputLines.forEach(output -> {
-                    findAfterConnection(output);
+                    findAfterConnection(output, false);
                 });
             }
 
@@ -459,6 +497,7 @@ public class TableManagament extends TableApperance {
                 output.setStartX((e.getAnchorPane().getBoundsInParent().getMinX() + e.getAnchorPane().getBoundsInParent().getMaxX()) / 2);
                 output.setStartY((e.getAnchorPane().getBoundsInParent().getMinY() + e.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
             });
+
 
         });
     }
@@ -480,10 +519,34 @@ public class TableManagament extends TableApperance {
     }
 
 
-    public void setStateToConnectTables(String connectionType) {
+    public void setStateToConnectTables(String connectionType, Button addComponentButton) {
         this.connectionType = connectionType;
+        this.addComponentButton = addComponentButton;
         this.canConnectTablesMainState = true;
         this.canFirstConnectTable = true;
         this.canSecondConnectTable = false;
+
+    }
+
+    public void workingPaneClickHandler(MouseEvent event) {
+        if (event.getButton().name().equals("SECONDARY")) {
+            this.canConnectTablesMainState = false;
+            this.canFirstConnectTable = false;
+            this.canSecondConnectTable = false;
+            if (!addComponentButton.equals(null)) {
+                addComponentButton.setDisable(false);
+                if (lineConnections.size() > 0) {
+                    LineConnection lineConnection = lineConnections.get(lineConnections.size() - 1);
+                    MoveableNodeModel moveableNodeModel = findAfterConnection(lineConnection, false);
+                    if (moveableNodeModel == null) {
+                        content.getChildren().remove(lineConnection.getLine());
+                        if (!(lineConnection.getCircle() == null))
+                            content.getChildren().remove(lineConnection.getCircle());
+                        lineConnections.remove(lineConnection);
+                    }
+                }
+            }
+        }
+
     }
 }
