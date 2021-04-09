@@ -408,6 +408,9 @@ public class TableManagament extends TableApperance {
                 inputLines.forEach(input -> {
                     input.setStartY(input.getStartY() + 3);
                 });
+                outputLines.forEach(output -> {
+                    findAfterConnection(output);
+                });
 
             }
             if (newTranslateY < -537 + e.getAnchorPane().getLayoutY()) {
@@ -416,6 +419,9 @@ public class TableManagament extends TableApperance {
                 inputLines.forEach(input -> {
                     input.setStartY(input.getStartY() - 3);
                 });
+                outputLines.forEach(output -> {
+                    findAfterConnection(output);
+                });
             }
 
             if (newTranslateX < -578 + e.getAnchorPane().getLayoutX()) {
@@ -423,6 +429,9 @@ public class TableManagament extends TableApperance {
                 setOtherNodesInPane(e, -3, true);
                 inputLines.forEach(input -> {
                     input.setStartX(input.getStartX() - 3);
+                });
+                outputLines.forEach(output -> {
+                    findAfterConnection(output);
                 });
             }
 
