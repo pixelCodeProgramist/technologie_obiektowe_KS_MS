@@ -82,7 +82,7 @@ public class TableManagament extends TableApperance {
         distances.put(bottom, startPosition.distance(bottom));
         distances.put(bottomFQ, startPosition.distance(bottomFQ));
         distances.put(bottomH, startPosition.distance(bottomH));
-        distances.put(bottomFQ, startPosition.distance(bottomFQ));
+        distances.put(bottomLQ, startPosition.distance(bottomLQ));
         return distances.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
     }
 
