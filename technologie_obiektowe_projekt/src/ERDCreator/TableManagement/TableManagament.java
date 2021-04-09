@@ -48,41 +48,23 @@ public class TableManagament extends TableApperance {
     }
 
     public Point2D calculateTheShortestPoint(MoveableNodeModel moveableNodeModel, LineConnection lineConnection) {
-        Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(), lineConnection.getEndY());
-        Point2D leftFQ = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(), lineConnection.getEndY()+moveableNodeModel.getAnchorPane().getHeight()/4);
-        Point2D leftHalf = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(), lineConnection.getEndY()+moveableNodeModel.getAnchorPane().getHeight()/2);
-        Point2D leftLQ = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(), lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*3)/4);
-        Point2D top = new Point2D(lineConnection.getEndX(), moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
-        Point2D topFQ = new Point2D(lineConnection.getEndX()+moveableNodeModel.getAnchorPane().getWidth()/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
-        Point2D topH = new Point2D(lineConnection.getEndX()+moveableNodeModel.getAnchorPane().getWidth()/2, moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
-        Point2D topLQ = new Point2D(lineConnection.getEndX()+(moveableNodeModel.getAnchorPane().getWidth()*3)/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
-        Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(), lineConnection.getEndY());
-        Point2D rightFQ = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(), lineConnection.getEndY()+moveableNodeModel.getAnchorPane().getHeight()/4);
-        Point2D rightHalf = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(), lineConnection.getEndY()+moveableNodeModel.getAnchorPane().getHeight()/2);
-        Point2D rightLQ = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(), lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*3)/4);
-        Point2D bottom = new Point2D(lineConnection.getEndX(), moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
-        Point2D bottomFQ = new Point2D(lineConnection.getEndX()+moveableNodeModel.getAnchorPane().getWidth()/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
-        Point2D bottomH = new Point2D(lineConnection.getEndX()+moveableNodeModel.getAnchorPane().getWidth()/2, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
-        Point2D bottomLQ = new Point2D(lineConnection.getEndX()+(moveableNodeModel.getAnchorPane().getWidth()*3)/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
-
         Point2D startPosition = new Point2D(lineConnection.getStartX(), lineConnection.getStartY());
         Map<Point2D, Double> distances = new HashMap<>();
-        distances.put(left, startPosition.distance(left));
-        distances.put(leftFQ, startPosition.distance(leftFQ));
-        distances.put(leftHalf, startPosition.distance(leftHalf));
-        distances.put(leftLQ, startPosition.distance(leftLQ));
-        distances.put(top, startPosition.distance(top));
-        distances.put(topFQ, startPosition.distance(topFQ));
-        distances.put(topH, startPosition.distance(topH));
-        distances.put(topLQ, startPosition.distance(topLQ));
-        distances.put(right, startPosition.distance(right));
-        distances.put(rightFQ, startPosition.distance(rightFQ));
-        distances.put(rightHalf, startPosition.distance(rightHalf));
-        distances.put(rightLQ, startPosition.distance(rightLQ));
-        distances.put(bottom, startPosition.distance(bottom));
-        distances.put(bottomFQ, startPosition.distance(bottomFQ));
-        distances.put(bottomH, startPosition.distance(bottomH));
-        distances.put(bottomLQ, startPosition.distance(bottomLQ));
+        for(int i=0;i<4;i++){
+            Point2D left = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMinX(),
+                    lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*i)/4);
+            distances.put(left, startPosition.distance(left));
+            Point2D top = new Point2D(lineConnection.getEndX()+(moveableNodeModel.getAnchorPane().getWidth()*i)/4,
+                    moveableNodeModel.getAnchorPane().getBoundsInParent().getMinY());
+            distances.put(top, startPosition.distance(top));
+            Point2D right = new Point2D(moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxX(),
+                    lineConnection.getEndY()+(moveableNodeModel.getAnchorPane().getHeight()*i)/4);
+            distances.put(right, startPosition.distance(right));
+            Point2D bottom = new Point2D(lineConnection.getEndX()+
+                    (moveableNodeModel.getAnchorPane().getWidth()*i)/4, moveableNodeModel.getAnchorPane().getBoundsInParent().getMaxY());
+            distances.put(bottom, startPosition.distance(bottom));
+        }
+
         return distances.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
     }
 
