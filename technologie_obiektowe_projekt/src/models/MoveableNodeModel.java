@@ -38,9 +38,7 @@ public class MoveableNodeModel {
         return lineConnectionStringMap;
     }
 
-    public void setLineConnectionStringMap(Map<LineConnection, String> lineConnectionStringMap) {
-        this.lineConnectionStringMap = lineConnectionStringMap;
-    }
+
 
     public void addLineConnection(LineConnection lineConnection, String input) {
         lineConnectionStringMap.put(lineConnection,input);

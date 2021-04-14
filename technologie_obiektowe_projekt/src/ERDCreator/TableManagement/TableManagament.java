@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -93,6 +94,11 @@ public class TableManagament extends TableApperance {
             if (connectionType.equals("1 do 1")) content.getChildren().addAll(lineConnection.getLine());
             lineConnection.getLine().toBack();
             lineConnection.getCircle().toBack();
+            if(logTextAreaID.getText().isEmpty()) {
+                logTextAreaID.setText("Zaznaczono tabele 1: " + lineConnection.getTableFirst());
+            }else {
+                logTextAreaID.setText(logTextAreaID.getText() + "\n" + "Zaznaczono tabele 1: " + lineConnection.getTableFirst());
+            }
         } else {
             lineConnection = lineConnections.get(lineConnections.size() - 1);
             canFirstConnectTable = false;
@@ -102,8 +108,16 @@ public class TableManagament extends TableApperance {
             Point2D endPoint = calculateTheShortestPoint(moveableNodeModel, lineConnection);
             lineConnection.setEndX(endPoint.getX());
             lineConnection.setEndY(endPoint.getY());
+            lineConnection.setTableSecond(moveableNodeModel.getAnchorPane());
             moveableNodeModel.addLineConnection(lineConnection, "input");
-            addForeignKey(findAfterConnection(lineConnection, true),moveableNodeModel,lineConnection.getConnectionType());
+
+
+            addForeignKey(findAfterAnchorPane(lineConnection.getTableSecond()),moveableNodeModel,lineConnection.getConnectionType());
+            if(logTextAreaID.getText().isEmpty()) {
+                logTextAreaID.setText("Zaznaczono tabele 2: " + lineConnection.getTableSecond());
+            }else {
+                logTextAreaID.setText(logTextAreaID.getText() + "\n" + "Zaznaczono tabele 2: " + lineConnection.getTableSecond());
+            }
         }
 
 
@@ -397,11 +411,24 @@ public class TableManagament extends TableApperance {
 
         });
     }
+    public MoveableNodeModel findAfterAnchorPane(AnchorPane anchorPane){
+        AtomicReference<MoveableNodeModel> moveableNodeModel = new AtomicReference<>();
+        nodes.forEach(node->{
+            if(node.getAnchorPane().equals(anchorPane)) moveableNodeModel.set(node);
+        });
+        return moveableNodeModel.get();
+    }
 
     public MoveableNodeModel findAfterConnection(LineConnection lineConnection,boolean isSecond) {
         Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> {
-            if(!isSecond) return e.getLineConnectionStringMap().get(lineConnection).equals("input");
-            return e.getLineConnectionStringMap().get(lineConnection).equals("output");
+            if(e.getLineConnectionStringMap().size()>0) {
+
+                if (!isSecond) {
+                    return e.getLineConnectionStringMap().get(lineConnection).equals("input");
+                }
+                return e.getLineConnectionStringMap().get(lineConnection).equals("output");
+            }
+            return false;
         }).findAny();
         if (moveableNodeModel.isPresent()) {
             if(!isSecond) {
