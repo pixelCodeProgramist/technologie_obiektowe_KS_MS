@@ -2,6 +2,7 @@ package SQLCreator;
 
 import Config.Configuration;
 import ERDCreator.ERDCreatorController;
+import ERDCreator.Line.LineConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -16,6 +17,7 @@ import models.MoveableNodeModel;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -25,15 +27,17 @@ public class SQLCreatorController implements Initializable {
     private TextArea textAreaID;
     private ArrayList<NodeSplitter> nodeSplitters;
     private Set<MoveableNodeModel> nodes;
-    public SQLCreatorController(Set<MoveableNodeModel> nodes) {
+    private List<LineConnection> lineConnections;
+    public SQLCreatorController(Set<MoveableNodeModel> nodes, List<LineConnection> lineConnections) {
         this.nodes = nodes;
+        this.lineConnections = lineConnections;
         this.nodeSplitters = new ArrayList<>();
     }
 
     @FXML
     public void backToWorkspace(MouseEvent mouseEvent) throws IOException {
         Configuration configuration = new Configuration();
-        configuration.changeScene("../ERDCreator/ERDCreator.fxml", mouseEvent, new ERDCreatorController(nodes));
+        configuration.changeScene("../ERDCreator/ERDCreator.fxml", mouseEvent, new ERDCreatorController(nodes,lineConnections));
     }
 
 
@@ -41,6 +45,7 @@ public class SQLCreatorController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.textAreaID.setEditable(false);
         buildListNodeSpitters();
+
     }
 
     private void buildListNodeSpitters(){
@@ -48,6 +53,9 @@ public class SQLCreatorController implements Initializable {
             NodeSplitter nodeSplitter = new NodeSplitter(node);
             this.textAreaID.setText(this.textAreaID.getText()+nodeSplitter.buildQuery());
         });
+        ConnectionSQLCreator connectionSQLCreator = new ConnectionSQLCreator(lineConnections);
+        this.textAreaID.setText(this.textAreaID.getText() +connectionSQLCreator.buildSQL());
+
     }
 
 

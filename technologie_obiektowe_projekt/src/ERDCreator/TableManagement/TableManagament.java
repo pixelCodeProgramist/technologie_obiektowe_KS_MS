@@ -1,6 +1,7 @@
 package ERDCreator.TableManagement;
 
 import ERDCreator.Line.LineConnection;
+import ERDCreator.Time.TimerToLog;
 import ERDCreator.resources.XTableView;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -38,16 +39,15 @@ public class TableManagament extends TableApperance {
 
     private Button addComponentButton;
 
-    public TableManagament() {
-        lineConnections = new ArrayList<>();
-    }
+
 
     public void setParameters(Pane content, ScrollPane workingPane, Set<MoveableNodeModel> nodes,
-                              Optional<Model> chosenModel, TextArea logTextAreaID) {
+                              Optional<Model> chosenModel, TextArea logTextAreaID, List<LineConnection> lineConnections) {
         this.content = content;
         this.workingPane = workingPane;
         this.nodes = nodes;
         this.logTextAreaID = logTextAreaID;
+        this.lineConnections = lineConnections;
         setChosenModel(chosenModel);
     }
 
@@ -94,10 +94,10 @@ public class TableManagament extends TableApperance {
             if (connectionType.equals("1 do 1")) content.getChildren().addAll(lineConnection.getLine());
             lineConnection.getLine().toBack();
             lineConnection.getCircle().toBack();
-            if(logTextAreaID.getText().isEmpty()) {
-                logTextAreaID.setText("Zaznaczono tabele 1: " + lineConnection.getTableFirst());
+            if(logTextAreaID.getText().trim().equals("")) {
+                logTextAreaID.setText("["+ TimerToLog.getTime()+"]  Zaznaczono tabele 1: " + moveableNodeModel.getLabel().getText());
             }else {
-                logTextAreaID.setText(logTextAreaID.getText() + "\n" + "Zaznaczono tabele 1: " + lineConnection.getTableFirst());
+                logTextAreaID.setText(logTextAreaID.getText()+ "\n"+"["+TimerToLog.getTime()+"] "   + "Zaznaczono tabele 1: " + moveableNodeModel.getLabel().getText());
             }
         } else {
             lineConnection = lineConnections.get(lineConnections.size() - 1);
@@ -110,13 +110,16 @@ public class TableManagament extends TableApperance {
             lineConnection.setEndY(endPoint.getY());
             lineConnection.setTableSecond(moveableNodeModel.getAnchorPane());
             moveableNodeModel.addLineConnection(lineConnection, "input");
+            if(lineConnection.getConnectionType().equals("1 do *")){
+                lineConnection.setConnectedKey(findPrimaryKey(moveableNodeModel.getxTableView()));
+            }
 
-
-            addForeignKey(findAfterAnchorPane(lineConnection.getTableSecond()),moveableNodeModel,lineConnection.getConnectionType());
+            addForeignKey(findAfterAnchorPane(lineConnection.getTableFirst()),
+                    moveableNodeModel,lineConnection.getConnectionType(),lineConnection);
             if(logTextAreaID.getText().isEmpty()) {
-                logTextAreaID.setText("Zaznaczono tabele 2: " + lineConnection.getTableSecond());
+                logTextAreaID.setText("["+TimerToLog.getTime()+"]  Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText()+"\n");
             }else {
-                logTextAreaID.setText(logTextAreaID.getText() + "\n" + "Zaznaczono tabele 2: " + lineConnection.getTableSecond());
+                logTextAreaID.setText(logTextAreaID.getText()+ "\n"+"["+TimerToLog.getTime()+"] "   + "Zaznaczono tabele 2: " +moveableNodeModel.getLabel().getText()+"\n");
             }
         }
 
@@ -167,7 +170,7 @@ public class TableManagament extends TableApperance {
             });
 
             moveableNodeModel.getxTableView().setOnMouseClicked(ec -> {
-                setResize(moveableNodeModel, logTextAreaID);
+                setResize(moveableNodeModel, logTextAreaID, lineConnections);
             });
 
             moveableNodeModel.getxTableView().setOnMousePressed(mp -> {
@@ -194,18 +197,18 @@ public class TableManagament extends TableApperance {
         });
     }
 
-    public void addForeignKey(MoveableNodeModel modelFrom,MoveableNodeModel modelTo,String typeKey) {
+    public void addForeignKey(MoveableNodeModel modelFrom,MoveableNodeModel modelTo,String typeKey,LineConnection lineConnection) {
         try {
             Model model2 = new Model("images/keys/gray.png", "");
             if(typeKey.equals("1 do *")) {
                 TableModel tableModel = new TableModel(modelFrom.getLabel().getText()+modelTo.getLabel().getText()+"fk",
                         "NUMBER", model2.getImageView(20, 20), "U/NN");
-
                 modelTo.getAnchorPane().setMinHeight(modelTo.getAnchorPane().getMinWidth() + 30);
                 modelTo.getAnchorPane().setMaxHeight(modelTo.getAnchorPane().getMaxHeight() + 30);
                 modelTo.getxTableView().setMinHeight(modelTo.getxTableView().getMinWidth() + 70);
                 modelTo.getxTableView().setMaxHeight(modelTo.getxTableView().getMaxHeight() + 70);
                 tableModel.assignKey(modelTo.getxTableView());
+                lineConnection.setTableModel(tableModel);
             }
         } catch (FileNotFoundException fileNotFoundException) {
             fileNotFoundException.printStackTrace();
@@ -560,7 +563,7 @@ public class TableManagament extends TableApperance {
             this.canConnectTablesMainState = false;
             this.canFirstConnectTable = false;
             this.canSecondConnectTable = false;
-            if (!addComponentButton.equals(null)) {
+            if (addComponentButton!=null) {
                 addComponentButton.setDisable(false);
                 if (lineConnections.size() > 0) {
                     LineConnection lineConnection = lineConnections.get(lineConnections.size() - 1);

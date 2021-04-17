@@ -1,5 +1,7 @@
 package ERDCreator.TableManagement;
 
+import ERDCreator.Line.LineConnection;
+import ERDCreator.Time.TimerToLog;
 import ERDCreator.resources.XTableView;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -101,20 +103,32 @@ public class TableApperance {
                     if (ec.getCode().equals(KeyCode.ENTER))
                         if (numberOfDuplicateLabelName.get() == 0) {
                             if (logTextAreaID.getText().equals(""))
-                                logTextAreaID.setText(label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
+                                logTextAreaID.setText("[" + TimerToLog.getTime() + "]" + label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
                             else
-                                logTextAreaID.setText(logTextAreaID.getText() + label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
+                                logTextAreaID.setText(logTextAreaID.getText() + "[" + TimerToLog.getTime() + "] " + label.getId() + ": " + "Nie zmieniono " + beforeModificationLabel.getText() + " na " + label.getText() + "\n");
                         } else {
-                            logTextAreaID.setText(logTextAreaID.getText() + label.getId() + ": " + "Tabela o takiej nazwie już istnieje\n");
+                            logTextAreaID.setText(logTextAreaID.getText() + "[" + TimerToLog.getTime() + "] " + label.getId() + ": " + "Tabela o takiej nazwie już istnieje\n");
                         }
                 }
             });
         });
     }
 
+    protected TableModel findPrimaryKey(XTableView xTableView){
+        List<TableModel> tableModels = xTableView.getItems();
+        AtomicReference<TableModel> tableModelPK = new AtomicReference<>();
+        tableModels.forEach(tableModel -> {
+            if(tableModel.isPrimaryKey())
+                tableModelPK.set(tableModel);
+        });
+        if(tableModelPK!=null)
+            return tableModelPK.get();
+        return null;
+    }
 
-    protected void setResize(MoveableNodeModel m, TextArea logTextAreaID) {
+    protected void setResize(MoveableNodeModel m, TextArea logTextAreaID, List<LineConnection> lineConnections) {
         XTableView xTableView = m.getxTableView();
+        TableModel primaryKeyModel = findPrimaryKey(xTableView);
         AtomicReference<Double> max = new AtomicReference<>((double) 10);
         xTableView.getColumns().stream().forEach(column -> {
             TableColumn tableColumn = (TableColumn) column;
@@ -125,14 +139,15 @@ public class TableApperance {
                 TableColumn.CellEditEvent cellEditEvent = (TableColumn.CellEditEvent) comm;
                 TableModel tableModel = (TableModel)
                         cellEditEvent.getTableView().getItems().get(cellEditEvent.getTablePosition().getRow());
+
                 if (cellEditEvent.getTablePosition().getColumn() == 0) {
                     String rowFieldName = (String) cellEditEvent.getNewValue();
                     ArrayList<String> fieldNames = new ArrayList<>();
                     if (!prohibitedTableNames.contains(rowFieldName.toUpperCase())
-                            &&!availableTypeNamesWithBracket.contains(rowFieldName.toUpperCase())
-                            &&!availableTypeNamesWithoutBracket.contains(rowFieldName.toUpperCase())
-                            &&rowFieldName.length()>1
-                            &&!rowFieldName.startsWith("--")) {
+                            && !availableTypeNamesWithBracket.contains(rowFieldName.toUpperCase())
+                            && !availableTypeNamesWithoutBracket.contains(rowFieldName.toUpperCase())
+                            && rowFieldName.length() > 1
+                            && !rowFieldName.startsWith("--")) {
                         xTableView.getItems().forEach(row -> {
                             fieldNames.add(((TableModel) row).getId());
                         });
@@ -148,17 +163,23 @@ public class TableApperance {
                         } else {
 
                             tableModel.setId((String) cellEditEvent.getOldValue());
-                            logTextAreaID.setText(logTextAreaID.getText() + xTableView.toString().split("\\[")[0] + " :Taka nazwa jest już w tabeli "
+                            logTextAreaID.setText(logTextAreaID.getText() + "[" + TimerToLog.getTime() + "] " + xTableView.toString().split("\\[")[0] + " :Taka nazwa jest już w tabeli "
                                     + m.getLabel().getText() + ". Nazwa pola nie została zmieniona z " + tableModel.getId() + " na nazwę " + rowFieldName + "\n");
                         }
                     } else {
 
                         tableModel.setId((String) cellEditEvent.getOldValue());
 
-                        logTextAreaID.setText(logTextAreaID.getText() + xTableView.toString().split("\\[")[0] + " :Niedozwolona nazwa w tabeli "
+                        logTextAreaID.setText(logTextAreaID.getText() + "[" + TimerToLog.getTime() + "] " + xTableView.toString().split("\\[")[0] + " :Niedozwolona nazwa w tabeli "
                                 + m.getLabel().getText() + ". Nazwa pola nie została zmieniona z " + tableModel.getId() + " na nazwę " + rowFieldName + "\n");
                     }
-                    tableModel.updateData(xTableView);
+
+                    TableModel tableModelB = tableModel.updateData(xTableView);
+                    lineConnections.forEach(e -> {
+                        if (e.getTableModel().equals(tableModel))
+                            e.setTableModel(tableModelB);
+                            e.setConnectedKey(primaryKeyModel);
+                    });
                 }
                 if (cellEditEvent.getTablePosition().getColumn() == 1) {
                     String typeString = (String) cellEditEvent.getNewValue();
@@ -190,7 +211,7 @@ public class TableApperance {
                     }
 
                     if (!cellEditEvent.getOldValue().equals(typeString)) {
-                        logTextAreaID.setText(logTextAreaID.getText() + m.getxTableView().toString().split("\\[")[0]
+                        logTextAreaID.setText(logTextAreaID.getText() + "[" + TimerToLog.getTime() + "] " + m.getxTableView().toString().split("\\[")[0]
                                 + ": nie udało się w tabeli " + m.getLabel().getText() + " zmienić typu " + cellEditEvent.getOldValue() + " na typ " + typeString + "\n");
                     } else {
                         String[] splittedLogText = logTextAreaID.getText().split("\n");

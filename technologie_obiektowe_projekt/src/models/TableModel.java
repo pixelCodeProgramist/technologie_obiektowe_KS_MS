@@ -1,5 +1,6 @@
 package models;
 
+import ERDCreator.Line.LineConnection;
 import ERDCreator.resources.XTableView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -166,7 +167,7 @@ public class TableModel {
         xTableView.setItems(data);
     }
 
-    public void updateData(XTableView xTableView){
+    public TableModel updateData(XTableView xTableView){
         List list = new ArrayList(xTableView.getItems());
         int index = list.indexOf(this);
         list.remove(this);
@@ -178,20 +179,7 @@ public class TableModel {
         list.add(index,t);
         ObservableList data = FXCollections.observableList(list);
         xTableView.setItems(data);
-    }
-
-    @Override
-    public String toString() {
-        return "TableModel{" +
-                "id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", primaryForeignNoneKey=" + primaryForeignNoneKey +
-                ", additional='" + additional + '\'' +
-                ", primaryKey=" + primaryKey +
-                ", foreignKey=" + foreignKey +
-                ", isUnique=" + isUnique +
-                ", isNotNull=" + isNotNull +
-                '}';
+        return t;
     }
 }
 

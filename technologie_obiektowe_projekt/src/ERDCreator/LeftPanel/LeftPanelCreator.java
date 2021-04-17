@@ -55,16 +55,21 @@ public class LeftPanelCreator {
     }
 
     public void addNodeToWorkingPane(){
-        TreeItem<String> item = idTabels.getSelectionModel().getSelectedItem();
-        if (item != null) {
-            chosenModel = models.stream().filter(e ->
-                    e.getDescription().equals(item.getValue())).findFirst();
-            if (chosenModel.isPresent()) {
-                activatedToAddPane = true;
-            } else {
-                activatedToAddPane = false;
+        try {
+            TreeItem<String> item = idTabels.getSelectionModel().getSelectedItem();
+            if (item != null) {
+                chosenModel = models.stream().filter(e ->
+                        e.getDescription().equals(item.getValue())).findFirst();
+                if (chosenModel.isPresent()) {
+                    activatedToAddPane = true;
+                } else {
+                    activatedToAddPane = false;
+                }
             }
+        }catch (Exception e){
+
         }
+
     }
 
     public Optional<Model> getChosenModel() {

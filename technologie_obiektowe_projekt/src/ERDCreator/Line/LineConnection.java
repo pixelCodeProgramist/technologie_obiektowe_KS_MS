@@ -1,8 +1,11 @@
 package ERDCreator.Line;
 
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import models.TableModel;
 
 public class LineConnection {
     private String connectionType;
@@ -10,11 +13,29 @@ public class LineConnection {
     private AnchorPane tableSecond;
     private Line line;
     private Circle circle;
+    private TableModel tableModel;
+    private TableModel connectedKey;
 
     public LineConnection() {
         this.line = new Line();
         this.circle = new Circle();
         this.circle.setRadius(3);
+    }
+
+    public TableModel getConnectedKey() {
+        return connectedKey;
+    }
+
+    public void setConnectedKey(TableModel connectedKey) {
+        this.connectedKey = connectedKey;
+    }
+
+    public TableModel getTableModel() {
+        return tableModel;
+    }
+
+    public void setTableModel(TableModel tableModel) {
+        this.tableModel = tableModel;
     }
 
     public Circle getCircle() {
@@ -88,4 +109,5 @@ public class LineConnection {
     public void setLine(Line line) {
         this.line = line;
     }
+
 }
