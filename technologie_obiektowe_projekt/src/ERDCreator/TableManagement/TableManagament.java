@@ -454,22 +454,9 @@ public class TableManagament extends TableApperance {
         Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> {
             if (e.getLineConnectionStringMap().size() > 0) {
                 if (!isSecond) {
-                    try {
-                        return e.getLineConnectionStringMap().get(lineConnection).equals("input");
-                    }catch (Exception exception){}
-                    finally {
-                        content.getChildren().remove(lineConnection.getLine());
-                        if(lineConnection.getConnectionType().equals("1 do *")) content.getChildren().remove(lineConnection.getCircle());
-                    }
+                    return e.getLineConnectionStringMap().get(lineConnection).equals("input");
                 }
-                try {
-                    return e.getLineConnectionStringMap().get(lineConnection).equals("output");
-                }catch (Exception exception){}
-                finally {
-                    content.getChildren().remove(lineConnection.getLine());
-                    if(lineConnection.getConnectionType().equals("1 do *")) content.getChildren().remove(lineConnection.getCircle());
-                }
-
+                return e.getLineConnectionStringMap().get(lineConnection).equals("output");
             }
             return false;
         }).findAny();
@@ -626,8 +613,7 @@ public class TableManagament extends TableApperance {
                 addComponentButton.setDisable(false);
                 if (lineConnections.size() > 0) {
                     LineConnection lineConnection = lineConnections.get(lineConnections.size() - 1);
-                    MoveableNodeModel moveableNodeModel = findAfterConnection(lineConnection, false);
-                    if (moveableNodeModel == null) {
+                    if(lineConnection.getTableSecond()==null){
                         content.getChildren().remove(lineConnection.getLine());
                         if (!(lineConnection.getCircle() == null))
                             content.getChildren().remove(lineConnection.getCircle());
