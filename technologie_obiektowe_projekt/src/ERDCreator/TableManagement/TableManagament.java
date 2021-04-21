@@ -597,6 +597,7 @@ public class TableManagament extends TableApperance {
         });
     }
 
+
     public void clickLineSecondaryButton(MouseEvent event,LineConnection lineConnection){
         if (event.getButton().name().equals("SECONDARY")) {
             setInitialContextMenuForLineConnection(event,lineConnection);
