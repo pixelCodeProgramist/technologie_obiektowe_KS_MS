@@ -454,9 +454,22 @@ public class TableManagament extends TableApperance {
         Optional<MoveableNodeModel> moveableNodeModel = nodes.stream().filter(e -> {
             if (e.getLineConnectionStringMap().size() > 0) {
                 if (!isSecond) {
-                    return e.getLineConnectionStringMap().get(lineConnection).equals("input");
+                    try {
+                        return e.getLineConnectionStringMap().get(lineConnection).equals("input");
+                    }catch (Exception exception){}
+                    finally {
+                        content.getChildren().remove(lineConnection.getLine());
+                        if(lineConnection.getConnectionType().equals("1 do *")) content.getChildren().remove(lineConnection.getCircle());
+                    }
                 }
-                return e.getLineConnectionStringMap().get(lineConnection).equals("output");
+                try {
+                    return e.getLineConnectionStringMap().get(lineConnection).equals("output");
+                }catch (Exception exception){}
+                finally {
+                    content.getChildren().remove(lineConnection.getLine());
+                    if(lineConnection.getConnectionType().equals("1 do *")) content.getChildren().remove(lineConnection.getCircle());
+                }
+
             }
             return false;
         }).findAny();
