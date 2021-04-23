@@ -33,15 +33,26 @@ public class ConnectionSQLCreator {
             TableModel connectedKey = lineConnection.getConnectedKey();
 
             TableModel foreignKey = lineConnection.getTableModel();
-            String query = "ALTER TABLE " +tableSecondName.getText() + " ADD CONSTRAINT fk"+ UUID.randomUUID().toString().replace("-","").substring(0,27) +
+            String query;
+            if (lineConnection.getConnectionType().equals("1 do *")||lineConnection.getConnectionType().equals("1 do 1"))
+                query = "ALTER TABLE " +tableSecondName.getText() + " ADD CONSTRAINT fk"+ UUID.randomUUID().toString().replace("-","").substring(0,27) +
                     " FOREIGN KEY ("+foreignKey.getId()+") REFERENCES "+tableFirstName.getText()+"("+connectedKey.getId()+");";
+            else if(lineConnection.getConnectionType().equals("* do *")){
+                query = "CREATE TABLE " + tableFirstName.getText()+tableSecondName.getText()+" (\n"+
+                        lineConnection.getConnectedKey().getId() +tableFirstName.getText() + " "+
+                        lineConnection.getConnectedKey().getType() +
+                        " NOT NULL REFERENCES " + tableFirstName.getText()+"("+lineConnection.getConnectedKey().getId()+")"+ ",\n"+
+                        lineConnection.getConnectedKeySecond().getId()+tableSecondName.getText() + " "+
+                        lineConnection.getConnectedKeySecond().getType() +
+                        " NOT NULL REFERENCES " + tableSecondName.getText()+"("+lineConnection.getConnectedKeySecond().getId()
+                        +")"+ ",\n"+
+                        "PRIMARY KEY("+lineConnection.getConnectedKey().getId()+tableFirstName.getText()+","+
+                        lineConnection.getConnectedKeySecond().getId()+tableSecondName.getText()+"));";
+            }
+            else query="";
             queryBuilder.append(query);
             queryBuilder.append("\n\n");
         });
         return queryBuilder.toString();
     }
-
-
-
-
 }

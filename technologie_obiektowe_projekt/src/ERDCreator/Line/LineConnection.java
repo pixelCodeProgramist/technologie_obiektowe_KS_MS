@@ -13,13 +13,25 @@ public class LineConnection {
     private AnchorPane tableSecond;
     private Line line;
     private Circle circle;
+    private Circle startCircle;
     private TableModel tableModel;
     private TableModel connectedKey;
+    private TableModel connectedKeySecond;
 
     public LineConnection() {
         this.line = new Line();
         this.circle = new Circle();
         this.circle.setRadius(3);
+        this.startCircle = new Circle();
+        this.startCircle.setRadius(3);
+    }
+
+    public TableModel getConnectedKeySecond() {
+        return connectedKeySecond;
+    }
+
+    public void setConnectedKeySecond(TableModel connectedKeySecond) {
+        this.connectedKeySecond = connectedKeySecond;
     }
 
     public TableModel getConnectedKey() {
@@ -38,27 +50,37 @@ public class LineConnection {
         this.tableModel = tableModel;
     }
 
+    public Circle getStartCircle() {
+        return startCircle;
+    }
+
     public Circle getCircle() {
         return circle;
     }
 
     public void setStartX(double x) {
         line.setStartX(x);
+        if (connectionType.equals("* do *")){
+            this.startCircle.setLayoutX(x);
+        }
     }
 
     public void setStartY(double y) {
         line.setStartY(y);
+        if (connectionType.equals("* do *")){
+            this.startCircle.setLayoutY(y);
+        }
     }
 
     public void setEndX(double x) {
         line.setEndX(x);
-        if (connectionType.equals("1 do *"))
+        if (connectionType.equals("1 do *")||connectionType.equals("* do *"))
             this.circle.setLayoutX(x);
     }
 
     public void setEndY(double y) {
         line.setEndY(y);
-        if (connectionType.equals("1 do *"))
+        if (connectionType.equals("1 do *")||connectionType.equals("* do *"))
             this.circle.setLayoutY(y);
     }
 

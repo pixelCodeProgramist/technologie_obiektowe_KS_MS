@@ -65,7 +65,8 @@ public class ERDCreatorController {
         this.lineConnections.forEach(e->{
             content.getChildren().add(e.getLine());
             e.getLine().toBack();
-            if(e.getConnectionType().equals("1 do *")) content.getChildren().add(e.getCircle());
+            if(e.getConnectionType().equals("1 do *")||e.getConnectionType().equals("* do *")) content.getChildren().add(e.getCircle());
+            if(e.getConnectionType().equals("* do *")) content.getChildren().add(e.getStartCircle());
         });
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
         workingPane.setOnMouseClicked(tableManagament::workingPaneClickHandler);
