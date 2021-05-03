@@ -1,8 +1,10 @@
 package ERDCreator.TableManagement;
 
 import ERDCreator.Line.LineConnection;
+import ERDCreator.NewWindow.NewWindowCreator;
 import ERDCreator.Time.TimerToLog;
 import ERDCreator.resources.XTableView;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
@@ -10,6 +12,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import models.Model;
 import models.MoveableNodeModel;
 import models.TableModel;
@@ -37,7 +41,6 @@ public class TableManagament extends TableApperance {
     private boolean canFirstConnectTable;
     private boolean canSecondConnectTable;
     private String connectionType;
-
     private Button addComponentButton;
 
 
@@ -138,9 +141,17 @@ public class TableManagament extends TableApperance {
                 } else {
                     logTextAreaID.setText(logTextAreaID.getText() + "\n" + "[" + TimerToLog.getTime() + "] " + "Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText() + "\n");
                 }
+                if(lineConnection.getConnectionType().equals("1 do *")) {
+                    Pane ERDCreatorPane = (Pane) workingPane.getParent();
+                    NewWindowCreator newWindowCreator = new NewWindowCreator();
+                    ERDCreatorPane.setDisable(true);
+                    newWindowCreator.start(lineConnection,ERDCreatorPane);
+
+                }
             }
         }
     }
+
 
 
     public void addTableClick() throws IOException {
@@ -608,7 +619,9 @@ public class TableManagament extends TableApperance {
     public void setInitialContextMenuForLineConnection(MouseEvent event, LineConnection lineConnection) {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem menuItem = new MenuItem("Usuń relacje");
+        MenuItem menuItem1 = new MenuItem("Zmień odwołanie do klucza");
         contextMenu.getItems().addAll(menuItem);
+        if(lineConnection.getConnectionType().equals("1 do *")) contextMenu.getItems().addAll(menuItem1);
         contextMenu.show(lineConnection.getLine(), event.getScreenX(), event.getScreenY());
         contextMenu.getItems().get(0).setOnAction(e -> {
             content.getChildren().remove(lineConnection.getLine());
@@ -621,6 +634,12 @@ public class TableManagament extends TableApperance {
                 xTableView.getItems().remove(xTableView.getItems().size() - 1);
             }
             lineConnections.remove(lineConnection);
+        });
+        contextMenu.getItems().get(1).setOnAction(e -> {
+            Pane ERDCreatorPane = (Pane) workingPane.getParent();
+            NewWindowCreator newWindowCreator = new NewWindowCreator();
+            ERDCreatorPane.setDisable(true);
+            newWindowCreator.start(lineConnection,ERDCreatorPane);
         });
     }
 
