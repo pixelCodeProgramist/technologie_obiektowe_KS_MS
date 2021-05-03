@@ -16,8 +16,8 @@ import models.TableModel;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -108,64 +108,40 @@ public class TableManagament extends TableApperance {
                 lineConnection = lineConnections.get(lineConnections.size() - 1);
                 lineConnection.setTableSecond(moveableNodeModel.getAnchorPane());
 
-                if (!checkIfExistLineConnection(lineConnection)) {
-                    canFirstConnectTable = false;
-                    canSecondConnectTable = false;
-                    canConnectTablesMainState = false;
-                    addComponentButton.setDisable(false);
-                    Point2D endPoint = calculateTheShortestPoint(moveableNodeModel, lineConnection);
-                    lineConnection.setEndX(endPoint.getX());
-                    lineConnection.setEndY(endPoint.getY());
-                    Point2D startPoint = calculateTheShortestPoint(findAfterAnchorPane(lineConnection.getTableFirst()),
-                            lineConnection);
-                    lineConnection.setStartX(startPoint.getX());
-                    lineConnection.setStartY(startPoint.getY());
-                    moveableNodeModel.addLineConnection(lineConnection, "input");
-                    if (lineConnection.getConnectionType().equals("1 do *") || lineConnection.getConnectionType().equals("1 do 1")) {
-                        lineConnection.setConnectedKey(findPrimaryKey(moveableNodeModel.getxTableView()));
-                    }
-                    if(lineConnection.getConnectionType().equals("* do *")){
-                        lineConnection.setConnectedKey(
-                                findPrimaryKey(findAfterAnchorPane(lineConnection.getTableFirst()).getxTableView()));
-                        lineConnection.setConnectedKeySecond(
-                                findPrimaryKey(findAfterAnchorPane(lineConnection.getTableSecond()).getxTableView()));
-                    }
 
-                    addForeignKey(findAfterAnchorPane(lineConnection.getTableFirst()),
-                            moveableNodeModel, lineConnection.getConnectionType(), lineConnection);
-                    if (logTextAreaID.getText().isEmpty()) {
-                        logTextAreaID.setText("[" + TimerToLog.getTime() + "]  Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText() + "\n");
-                    } else {
-                        logTextAreaID.setText(logTextAreaID.getText() + "\n" + "[" + TimerToLog.getTime() + "] " + "Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText() + "\n");
-                    }
+                canFirstConnectTable = false;
+                canSecondConnectTable = false;
+                canConnectTablesMainState = false;
+                addComponentButton.setDisable(false);
+                Point2D endPoint = calculateTheShortestPoint(moveableNodeModel, lineConnection);
+                lineConnection.setEndX(endPoint.getX());
+                lineConnection.setEndY(endPoint.getY());
+                Point2D startPoint = calculateTheShortestPoint(findAfterAnchorPane(lineConnection.getTableFirst()),
+                        lineConnection);
+                lineConnection.setStartX(startPoint.getX());
+                lineConnection.setStartY(startPoint.getY());
+                moveableNodeModel.addLineConnection(lineConnection, "input");
+                if (lineConnection.getConnectionType().equals("1 do *") || lineConnection.getConnectionType().equals("1 do 1")) {
+                    lineConnection.setConnectedKey(findPrimaryKey(moveableNodeModel.getxTableView()));
+                }
+                if (lineConnection.getConnectionType().equals("* do *")) {
+                    lineConnection.setConnectedKey(
+                            findPrimaryKey(findAfterAnchorPane(lineConnection.getTableFirst()).getxTableView()));
+                    lineConnection.setConnectedKeySecond(
+                            findPrimaryKey(findAfterAnchorPane(lineConnection.getTableSecond()).getxTableView()));
+                }
+
+                addForeignKey(findAfterAnchorPane(lineConnection.getTableFirst()),
+                        moveableNodeModel, lineConnection.getConnectionType(), lineConnection);
+                if (logTextAreaID.getText().isEmpty()) {
+                    logTextAreaID.setText("[" + TimerToLog.getTime() + "]  Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText() + "\n");
                 } else {
-                    lineConnection.setTableSecond(null);
-                    canFirstConnectTable = false;
-                    canSecondConnectTable = true;
-                    canConnectTablesMainState = true;
-                    addComponentButton.setDisable(true);
+                    logTextAreaID.setText(logTextAreaID.getText() + "\n" + "[" + TimerToLog.getTime() + "] " + "Zaznaczono tabele 2: " + moveableNodeModel.getLabel().getText() + "\n");
                 }
             }
         }
     }
 
-
-    public boolean checkIfExistLineConnection(LineConnection lineConnection) {
-        AtomicBoolean state = new AtomicBoolean(false);
-        if (lineConnections.size() > 0) {
-            LineConnection lastLineConnection = lineConnections.get(lineConnections.size() - 1);
-            lineConnections.forEach(iterLineConnection -> {
-                if (!lastLineConnection.equals(iterLineConnection)) {
-                    if (iterLineConnection.getTableFirst().equals(lineConnection.getTableFirst()) &&
-                            iterLineConnection.getTableSecond().equals(lineConnection.getTableSecond())
-                    ) {
-                        state.set(true);
-                    }
-                }
-            });
-        }
-        return state.get();
-    }
 
     public void addTableClick() throws IOException {
 
@@ -239,12 +215,32 @@ public class TableManagament extends TableApperance {
             });
         });
     }
+    public int getMaxIdOfTheSameForeignKeys(MoveableNodeModel modelTo,String foreignKey){
+        AtomicInteger iter = new AtomicInteger(1);
+        modelTo.getxTableView().getItems().forEach(modelIter->{
+            TableModel tableModelIter = (TableModel) modelIter;
+            if(tableModelIter.getId().contains(foreignKey)) {
+                String [] splittedStr = tableModelIter.getId().split(foreignKey);
+                if(splittedStr.length>0){
+                    String potentialNumber = splittedStr[1];
+                    if(potentialNumber.chars().allMatch( Character::isDigit)){
+                        BigDecimal number = new BigDecimal(potentialNumber);
+                        iter.set(number.intValue() + 1);
+                    }
+                }
+            }
+        });
+        return iter.get();
 
+    }
     public void addForeignKey(MoveableNodeModel modelFrom, MoveableNodeModel modelTo, String typeKey, LineConnection lineConnection) {
         try {
             Model model2 = new Model("images/keys/gray.png", "");
             if (typeKey.equals("1 do *") || typeKey.equals("1 do 1")) {
-                TableModel tableModel = new TableModel(modelFrom.getLabel().getText() + modelTo.getLabel().getText() + "fk",
+                String foreignKeyID = modelFrom.getLabel().getText() + modelTo.getLabel().getText() + "fk";
+
+
+                TableModel tableModel = new TableModel(foreignKeyID+getMaxIdOfTheSameForeignKeys(modelTo,foreignKeyID),
                         "NUMBER", model2.getImageView(20, 20), "U/NN");
                 modelTo.getAnchorPane().setMinHeight(modelTo.getAnchorPane().getMinWidth() + 30);
                 modelTo.getAnchorPane().setMaxHeight(modelTo.getAnchorPane().getMaxHeight() + 30);
@@ -569,15 +565,15 @@ public class TableManagament extends TableApperance {
                 input.setEndY(point2D.getY());
             });
             outputLines.forEach(output -> {
-                 if (output.getConnectionType().equals("* do *")) {
+                if (output.getConnectionType().equals("* do *")) {
                     Point2D point2D = calculateTheShortestPoint(findAfterAnchorPane(output.getTableFirst()), output);
                     output.setStartX(point2D.getX());
                     output.setStartY(point2D.getY());
-                }else {
-                     output.setStartX((e.getAnchorPane().getBoundsInParent().getMinX() + e.getAnchorPane().getBoundsInParent().getMaxX()) / 2);
-                     output.setStartY((e.getAnchorPane().getBoundsInParent().getMinY() + e.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
+                } else {
+                    output.setStartX((e.getAnchorPane().getBoundsInParent().getMinX() + e.getAnchorPane().getBoundsInParent().getMaxX()) / 2);
+                    output.setStartY((e.getAnchorPane().getBoundsInParent().getMinY() + e.getAnchorPane().getBoundsInParent().getMaxY()) / 2);
 
-                 }
+                }
             });
 
 
@@ -616,11 +612,11 @@ public class TableManagament extends TableApperance {
         contextMenu.show(lineConnection.getLine(), event.getScreenX(), event.getScreenY());
         contextMenu.getItems().get(0).setOnAction(e -> {
             content.getChildren().remove(lineConnection.getLine());
-            if (lineConnection.getConnectionType().equals("1 do *")|| lineConnection.getConnectionType().equals("* do *"))
+            if (lineConnection.getConnectionType().equals("1 do *") || lineConnection.getConnectionType().equals("* do *"))
                 content.getChildren().remove(lineConnection.getCircle());
             if (lineConnection.getConnectionType().equals("* do *"))
                 content.getChildren().remove(lineConnection.getStartCircle());
-            if(!lineConnection.getConnectionType().equals("* do *")) {
+            if (!lineConnection.getConnectionType().equals("* do *")) {
                 XTableView xTableView = (XTableView) lineConnection.getTableSecond().getChildren().get(1);
                 xTableView.getItems().remove(xTableView.getItems().size() - 1);
             }
