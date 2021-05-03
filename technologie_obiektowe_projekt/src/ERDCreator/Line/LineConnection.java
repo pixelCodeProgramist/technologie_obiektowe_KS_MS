@@ -21,9 +21,9 @@ public class LineConnection {
     public LineConnection() {
         this.line = new Line();
         this.circle = new Circle();
-        this.circle.setRadius(3);
+        this.circle.setRadius(6);
         this.startCircle = new Circle();
-        this.startCircle.setRadius(3);
+        this.startCircle.setRadius(6);
     }
 
     public TableModel getConnectedKeySecond() {

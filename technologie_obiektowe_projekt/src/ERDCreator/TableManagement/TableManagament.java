@@ -75,6 +75,7 @@ public class TableManagament extends TableApperance {
 
     public void connectTables(MoveableNodeModel moveableNodeModel) {
         LineConnection lineConnection;
+
         if (canFirstConnectTable) {
             lineConnection = new LineConnection();
             lineConnection.setConnectionType(this.connectionType);
@@ -106,6 +107,7 @@ public class TableManagament extends TableApperance {
             if (canSecondConnectTable) {
                 lineConnection = lineConnections.get(lineConnections.size() - 1);
                 lineConnection.setTableSecond(moveableNodeModel.getAnchorPane());
+
                 if (!checkIfExistLineConnection(lineConnection)) {
                     canFirstConnectTable = false;
                     canSecondConnectTable = false;
@@ -621,8 +623,8 @@ public class TableManagament extends TableApperance {
             if(!lineConnection.getConnectionType().equals("* do *")) {
                 XTableView xTableView = (XTableView) lineConnection.getTableSecond().getChildren().get(1);
                 xTableView.getItems().remove(xTableView.getItems().size() - 1);
-                lineConnections.remove(lineConnection);
             }
+            lineConnections.remove(lineConnection);
         });
     }
 
