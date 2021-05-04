@@ -93,11 +93,20 @@ public class TableManagament extends TableApperance {
             canSecondConnectTable = true;
             lineConnection.setEndX(lineConnection.getEndX());
             lineConnection.setEndY(lineConnection.getEndY());
+
             if (connectionType.equals("1 do *") || connectionType.equals("* do *"))
                 content.getChildren().addAll(lineConnection.getLine(), lineConnection.getCircle());
             if (connectionType.equals("* do *"))
                 content.getChildren().addAll(lineConnection.getStartCircle());
-            if (connectionType.equals("1 do 1")) content.getChildren().addAll(lineConnection.getLine());
+            if (connectionType.equals("1 do 1"))
+                content.getChildren().addAll(lineConnection.getLine());
+            if(connectionType.equals("dziedziczenie")) {
+                content.getChildren().addAll(lineConnection.getLine(),lineConnection.getFirstLine(),
+                        lineConnection.getSecondLine(),lineConnection.getThirdLine());
+                lineConnection.getFirstLine().toBack();
+                lineConnection.getSecondLine().toBack();
+                lineConnection.getThirdLine().toBack();
+            }
             lineConnection.getLine().toBack();
             lineConnection.getCircle().toBack();
             lineConnection.getStartCircle().toBack();
@@ -110,8 +119,6 @@ public class TableManagament extends TableApperance {
             if (canSecondConnectTable) {
                 lineConnection = lineConnections.get(lineConnections.size() - 1);
                 lineConnection.setTableSecond(moveableNodeModel.getAnchorPane());
-
-
                 canFirstConnectTable = false;
                 canSecondConnectTable = false;
                 canConnectTablesMainState = false;
@@ -629,18 +636,24 @@ public class TableManagament extends TableApperance {
                 content.getChildren().remove(lineConnection.getCircle());
             if (lineConnection.getConnectionType().equals("* do *"))
                 content.getChildren().remove(lineConnection.getStartCircle());
-            if (!lineConnection.getConnectionType().equals("* do *")) {
+            if (!lineConnection.getConnectionType().equals("* do *")&&!lineConnection.getConnectionType().equals("dziedziczenie")) {
                 XTableView xTableView = (XTableView) lineConnection.getTableSecond().getChildren().get(1);
                 xTableView.getItems().remove(xTableView.getItems().size() - 1);
             }
+            if(lineConnection.getConnectionType().equals("dziedziczenie")){
+                content.getChildren().removeAll(lineConnection.getFirstLine(),lineConnection.getSecondLine(),
+                        lineConnection.getThirdLine());
+            }
             lineConnections.remove(lineConnection);
         });
-        contextMenu.getItems().get(1).setOnAction(e -> {
-            Pane ERDCreatorPane = (Pane) workingPane.getParent();
-            NewWindowCreator newWindowCreator = new NewWindowCreator();
-            ERDCreatorPane.setDisable(true);
-            newWindowCreator.start(lineConnection,ERDCreatorPane);
-        });
+        if(lineConnection.getConnectionType().equals("1 do *")) {
+            contextMenu.getItems().get(1).setOnAction(e -> {
+                Pane ERDCreatorPane = (Pane) workingPane.getParent();
+                NewWindowCreator newWindowCreator = new NewWindowCreator();
+                ERDCreatorPane.setDisable(true);
+                newWindowCreator.start(lineConnection, ERDCreatorPane);
+            });
+        }
     }
 
 
@@ -663,8 +676,13 @@ public class TableManagament extends TableApperance {
                         content.getChildren().remove(lineConnection.getLine());
                         if (!(lineConnection.getCircle() == null))
                             content.getChildren().remove(lineConnection.getCircle());
+                        if(lineConnection.getFirstLine()!=null&&lineConnection.getSecondLine()!=null
+                                &&lineConnection.getThirdLine()!=null)
+                            content.getChildren().removeAll(lineConnection.getFirstLine(),lineConnection.getSecondLine(),
+                                    lineConnection.getThirdLine());
                         lineConnections.remove(lineConnection);
                     }
+
                 }
             }
         }

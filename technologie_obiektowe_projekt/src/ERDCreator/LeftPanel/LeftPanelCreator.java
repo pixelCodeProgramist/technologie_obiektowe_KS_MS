@@ -16,7 +16,7 @@ public class LeftPanelCreator {
     private TreeItem<String> others;
     private String[] relationsType = {"1 do 1", "1 do *", "* do *"};
     private String[] othersType = {"dziedziczenie"};
-    private String[] tableType = {"tabela", "klasa"};
+    private String[] tableType = {"tabela"};
     private TreeView<String> idTabels;
     private List<Model> models;
     private Optional<Model> chosenModel;

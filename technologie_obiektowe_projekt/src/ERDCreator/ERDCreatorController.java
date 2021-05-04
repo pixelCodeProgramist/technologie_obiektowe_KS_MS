@@ -67,6 +67,8 @@ public class ERDCreatorController {
             e.getLine().toBack();
             if(e.getConnectionType().equals("1 do *")||e.getConnectionType().equals("* do *")) content.getChildren().add(e.getCircle());
             if(e.getConnectionType().equals("* do *")) content.getChildren().add(e.getStartCircle());
+            if(e.getConnectionType().equals("dziedziczenie")) content.getChildren().addAll(e.getFirstLine(),e.getSecondLine(),
+                    e.getThirdLine());
         });
         workingPane.setOnMouseMoved(tableManagament::paneOnMouseMovedEventHandler);
         workingPane.setOnMouseClicked(tableManagament::workingPaneClickHandler);
