@@ -34,10 +34,6 @@ public class TableApperance {
     private final List<String> availableTypeNamesWithoutBracket = new ArrayList<>(Arrays.asList("AUDIO", "BFile", "BIGINT", "BINARY", "BINARY DOUBLE", "BINARY FLOAT", "BLOB", "CLOB", "DATALINK", "DATE", "DATETIME", "GRAPHIC", "HTTPURITYPE", "IMAGE", "INTEGER", "LONG CHAR", "LONG_RAW", "NCLOB", "NTEXT", "ORDAUDIO", "ORDDOC", "ORDIMAGE", "ORDIMAGE_SIGNATURE", "ORDVIDEO", "REAL", "ROWID", "SMALLDATETIME", "SMALLINT", "SQL_VARIANT", "SYS_ANYDATA", "SYS_ANYDATASET", "SYS_ANYTYPE", "TEXT", "TINYINT", "TIME", "URITYPE", "VARBINARY", "VARGRAPHIC", "VIDEO", "XDBURITYPE", "XMLTYPE", "JSON"));
 
     protected String getFirstTextToLabel() {
-        if (chosenModel.get().getDescription().equalsIgnoreCase("klasa")) {
-            classNumber++;
-            return "Klasa" + classNumber;
-        }
         if (chosenModel.get().getDescription().equalsIgnoreCase("tabela")) {
             tabelNumber++;
             return "Tabela" + tabelNumber;
@@ -46,10 +42,6 @@ public class TableApperance {
     }
 
     protected Background getColorToMovableNode() {
-        if (chosenModel.get().getDescription().equalsIgnoreCase("klasa"))
-            return new Background(new BackgroundFill(Color.GRAY,
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY));
         if (chosenModel.get().getDescription().equalsIgnoreCase("tabela")) {
             return new Background(new BackgroundFill(Color.LIGHTBLUE,
                     CornerRadii.EMPTY,
@@ -175,10 +167,13 @@ public class TableApperance {
                     }
 
                     TableModel tableModelB = tableModel.updateData(xTableView);
+
                     lineConnections.forEach(e -> {
-                        if (e.getTableModel().equals(tableModel))
-                            e.setTableModel(tableModelB);
+                        if(!e.getConnectionType().equals("dziedziczenie")) {
+                            if (e.getTableModel().equals(tableModel))
+                                e.setTableModel(tableModelB);
                             e.setConnectedKey(primaryKeyModel);
+                        }
                     });
                 }
                 if (cellEditEvent.getTablePosition().getColumn() == 1) {
