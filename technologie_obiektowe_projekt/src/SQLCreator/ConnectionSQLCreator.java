@@ -1,7 +1,9 @@
 package SQLCreator;
 
 import ERDCreator.Line.LineConnection;
+import ERDCreator.resources.XTableView;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
@@ -48,7 +50,29 @@ public class ConnectionSQLCreator {
                         +")"+ ",\n"+
                         "PRIMARY KEY("+lineConnection.getConnectedKey().getId()+tableFirstName.getText()+","+
                         lineConnection.getConnectedKeySecond().getId()+tableSecondName.getText()+"));";
-            }
+            }//else if(lineConnection.getConnectionType().equals("dziedziczenie")){
+                /*if(textArea.getText().contains("CREATE TABLE "+tableSecondName.getText())){
+                    //query = "";
+                    String textAreaString = textArea.getText();
+                    String [] splittedTextArea = textAreaString.split("CREATE TABLE "+tableSecondName.getText()+" \\(");
+                    String [] splittedPartTwo = splittedTextArea[1].split("\\);");
+                    StringBuilder newStringBuilder = new StringBuilder(",\n");
+                    List<TableModel> tableModels = ((XTableView)(lineConnection.getTableSecond().getChildren().get(1))).getItems();
+                    for(TableModel tableModel : tableModels){
+                        if(!tableModel.isPrimaryKey()&&!tableModel.isForeignKey()){
+                            newStringBuilder.append(tableModel.getId() + " " + tableModel.getType());
+                            if (tableModel.isUnique()) newStringBuilder.append(" UNIQUE");
+                            if (tableModel.isNotNull()) newStringBuilder.append(" NOT NULL");
+                            if (!tableModel.equals(tableModels.get(tableModels.size() - 1))) newStringBuilder.append(",\n");
+                        }
+                    }
+                    StringBuilder oldString = new StringBuilder(splittedPartTwo[0]);
+                    oldString.append(newStringBuilder.toString());
+                    query = textAreaString.replace(splittedPartTwo[0],oldString.toString());
+                    //textArea.setText(textAreaString.replace(splittedPartTwo[0],oldString.toString()));
+                    
+                }*/
+            //}
             else query="";
             queryBuilder.append(query);
             queryBuilder.append("\n\n");

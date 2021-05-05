@@ -26,17 +26,22 @@ public class NodeSplitter {
 
     public String buildQuery(){
         StringBuilder query = new StringBuilder();
-        query.append("CREATE TABLE "+getTableName()+" (\n");
-        this.rowsOfTable.forEach(row->{
-            query.append(row.getId()+" "+row.getType());
-            if(row.isPrimaryKey()) query.append(" NOT NULL PRIMARY KEY");
-            if(!row.isPrimaryKey()){
-                if(row.isUnique()) query.append(" UNIQUE");
-                if(row.isNotNull()) query.append(" NOT NULL");
-            }
-            if(!row.equals(rowsOfTable.get(rowsOfTable.size()-1))) query.append(",\n");
-        });
-        query.append(");\n\n");
+        int inheritenceNumber = (int) moveableNodeModel.getLineConnectionStringMap().entrySet().
+                stream().filter(conn -> conn.getKey().getConnectionType().equals("dziedziczenie")).count();
+        if(inheritenceNumber!=moveableNodeModel.getLineConnectionStringMap().size()) {
+            query.append("CREATE TABLE " + getTableName() + " (\n");
+            this.rowsOfTable.forEach(row -> {
+                query.append(row.getId() + " " + row.getType());
+                if (row.isPrimaryKey()) query.append(" NOT NULL PRIMARY KEY");
+                if (!row.isPrimaryKey()) {
+                    if (row.isUnique()) query.append(" UNIQUE");
+                    if (row.isNotNull()) query.append(" NOT NULL");
+                }
+                if (!row.equals(rowsOfTable.get(rowsOfTable.size() - 1))) query.append(",\n");
+            });
+            query.append(");\n\n");
+        }
+
         return query.toString();
     }
 

@@ -53,8 +53,11 @@ public class SQLCreatorController implements Initializable {
             NodeSplitter nodeSplitter = new NodeSplitter(node);
             this.textAreaID.setText(this.textAreaID.getText()+nodeSplitter.buildQuery());
         });
+        InheritanceCreator inheritanceCreator = new InheritanceCreator(lineConnections,textAreaID);
+        inheritanceCreator.buildSQL();
         ConnectionSQLCreator connectionSQLCreator = new ConnectionSQLCreator(lineConnections);
         this.textAreaID.setText(this.textAreaID.getText() +connectionSQLCreator.buildSQL());
+
 
     }
 
