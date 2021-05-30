@@ -284,7 +284,6 @@ public class TableManagament extends TableApperance {
                 ((CheckMenuItem) model.getContextMenu().getItems().get(5)).setSelected(selectedTableModel.isNotNull());
                 model.getContextMenu().show(workingPane, mp.getScreenX(), mp.getScreenY());
                 boolean primaryKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(3)).isSelected();
-//            boolean foreignKeyChecked = ((CheckMenuItem) model.getContextMenu().getItems().get(4)).isSelected();
                 if (primaryKeyChecked) {
                     model.getContextMenu().getItems().get(4).setVisible(false);
                     model.getContextMenu().getItems().get(5).setVisible(false);
@@ -292,11 +291,6 @@ public class TableManagament extends TableApperance {
                     model.getContextMenu().getItems().get(4).setVisible(true);
                     model.getContextMenu().getItems().get(5).setVisible(true);
                 }
-//            if (primaryKeyChecked || foreignKeyChecked) {
-//                model.getContextMenu().getItems().get(4).setVisible(false);
-//            }else {
-//                model.getContextMenu().getItems().get(4).setVisible(true);
-//            }
 
                 for (int i = 0; i < model.getContextMenu().getItems().size(); i++) {
 
@@ -371,26 +365,6 @@ public class TableManagament extends TableApperance {
                             }
                         });
                     }
-//                if (i == 4) {
-//                    model.getContextMenu().getItems().get(i).setOnAction(e -> {
-//                        selectedTableModel.setForeignKey(!selectedTableModel.isForeignKey());
-//                        if(selectedTableModel.isForeignKey()) {
-//                            try {
-//                                Model model2 = new Model("images/keys/gray.png", "");
-//                                selectedTableModel.setPrimaryForeignNoneKey(model2.getImageView(20, 20));
-//                                selectedTableModel.setPrimaryKey(false);
-//                                selectedTableModel.setNotNull(false);
-//                                selectedTableModel.setUnique(false);
-//                                selectedTableModel.updateDataKey(model.getxTableView(),false);
-//                            } catch (FileNotFoundException fileNotFoundException) {
-//                                fileNotFoundException.printStackTrace();
-//                            }
-//                        }else {
-//                            selectedTableModel.setPrimaryForeignNoneKey(null);
-//                            selectedTableModel.updateDataKey(model.getxTableView(),false);
-//                        }
-//                    });
-//                }
                     if (i == 4) {
                         model.getContextMenu().getItems().get(i).setOnAction(e -> {
                             String additional = selectedTableModel.getAdditional();

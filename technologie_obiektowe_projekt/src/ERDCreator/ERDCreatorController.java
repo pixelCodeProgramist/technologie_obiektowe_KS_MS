@@ -91,8 +91,7 @@ public class ERDCreatorController {
         try {
             if (leftPanelCreator.isActivatedToAddPane() && leftPanelCreator.getChosenModel().isPresent()) {
                 tableManagament.setParameters(content, workingPane, nodes, leftPanelCreator.getChosenModel(), logTextAreaID,lineConnections);
-                if (leftPanelCreator.getChosenModel().get().getDescription().equals("tabela")
-                        || leftPanelCreator.getChosenModel().get().getDescription().equals("klasa")) {
+                if (leftPanelCreator.getChosenModel().get().getDescription().equals("tabela")) {
                     tableManagament.addTableClick();
                 } else {
                     tableManagament.setStateToConnectTables(leftPanelCreator.getChosenModel().get().getDescription(), addComponentButton);

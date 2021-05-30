@@ -32,7 +32,6 @@ public class LeftPanelCreator {
         tabels = new TreeItem<String>("Tabele");
         relarionships = new TreeItem<String>("Relacje");
         others = new TreeItem<String>("Inne");
-        TreeItem<String> others = new TreeItem<String>("Inne");
         root.setExpanded(true);
 
         loadModel("images/tabels", tabels, tableType);

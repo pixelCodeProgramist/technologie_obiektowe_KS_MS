@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import models.MoveableNodeModel;
 import models.TableModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NodeSplitter {
@@ -12,12 +13,15 @@ public class NodeSplitter {
     private Label label;
     private XTableView xTableView;
     private List<TableModel> rowsOfTable;
+    private ArrayList<NodeSql> nodeSqls;
 
-    public NodeSplitter(MoveableNodeModel moveableNodeModel) {
-        this.moveableNodeModel = moveableNodeModel;
+
+    public NodeSplitter(MoveableNodeModel node, ArrayList<NodeSql> nodeSqls) {
+        this.moveableNodeModel = node;
         this.label = this.moveableNodeModel.getLabel();
         this.xTableView = this.moveableNodeModel.getxTableView();
         this.rowsOfTable = (List<TableModel>) this.xTableView.getItems();
+        this.nodeSqls = nodeSqls;
     }
 
     private String getTableName() {
@@ -29,6 +33,7 @@ public class NodeSplitter {
         int inheritenceNumber = (int) moveableNodeModel.getLineConnectionStringMap().entrySet().
                 stream().filter(conn -> conn.getKey().getConnectionType().equals("dziedziczenie")).count();
         if(inheritenceNumber!=moveableNodeModel.getLineConnectionStringMap().size()) {
+            NodeSql nodeSql = new NodeSql();
             query.append("CREATE TABLE " + getTableName() + " (\n");
             this.rowsOfTable.forEach(row -> {
                 query.append(row.getId() + " " + row.getType());
@@ -40,6 +45,8 @@ public class NodeSplitter {
                 if (!row.equals(rowsOfTable.get(rowsOfTable.size() - 1))) query.append(",\n");
             });
             query.append(");\n\n");
+            nodeSql.setHeaderAndBody(query.toString());
+            nodeSqls.add(nodeSql);
         }
 
         return query.toString();
